@@ -35,7 +35,7 @@ const ImeTextArea: React.FC = () => {
 
   return (
     <div>
-      <textarea className="ime-textarea"  ref={textArea} onKeyDown={onKeyDown} />
+      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown}/>
       <p className="typing-code">{typingCode}</p>
       {matchedChars.length ? (
         <div className="char-chooser">
@@ -58,6 +58,25 @@ const ImeTextArea: React.FC = () => {
 
   function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
     codeMatcher?.onKeyDown?.(event);
+    if (event.isDefaultPrevented()) {
+      return;
+    }
+
+    handleCopy(event);
+  }
+
+  function handleCopy(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    if (!((event.metaKey || event.ctrlKey || event.altKey) && event.key === 'Enter' && textArea.current)) {
+      return;
+    }
+
+    textArea.current.select();
+    document.execCommand('copy');
+    event.preventDefault();
+
+    if (event.shiftKey) {
+      textArea.current.value = '';
+    }
   }
 
   function onCharSend(char: string): void {
