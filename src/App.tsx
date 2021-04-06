@@ -2,8 +2,10 @@ import React from 'react';
 
 import { BrowserRouter, Redirect, Route } from 'react-router-dom';
 
-import './App.scss';
 import InputPage from './components/InputPage/InputPage';
+import SettingsPage from './components/SettingsPage/SettingsPage';
+import './App.scss';
+import './styles.scss';
 
 const App: React.FC = () => {
   return (
@@ -12,6 +14,9 @@ const App: React.FC = () => {
         <Route exact path="/" render={() => <Redirect to="/ime" />} />
         <Route path="/ime">
           <InputPage />
+        </Route>
+        <Route path="/settings">
+          <SettingsPage />
         </Route>
       </BrowserRouter>
     </div>

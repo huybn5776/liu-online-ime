@@ -1,0 +1,20 @@
+.icon-button {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  color: gray;
+  background-color: transparent;
+  border: 0;
+  border-radius: 4px;
+  transition: background-color .2s, color .2s, transform .2s;
+
+  &:hover {
+    color: black;
+    background-color: lightgray;
+  }
+
+  .icon {
+    margin: auto;
+    line-height: 1em;
+  }
+}
