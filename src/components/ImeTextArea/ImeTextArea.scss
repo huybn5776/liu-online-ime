@@ -1,5 +1,9 @@
 .ime-textarea {
-  height: 48px;
+  width: 100%;
+  max-width: 978px;
+  height: 320px;
+  max-height: 100%;
+  padding: 6px 4px;
   font-size: 16px;
 }
 
