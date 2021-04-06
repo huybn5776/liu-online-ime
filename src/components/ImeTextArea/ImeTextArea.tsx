@@ -18,8 +18,8 @@ const ImeTextArea: React.FC = () => {
     const componentDestroyed$$ = new Subject();
     loadCharMappings()
       .pipe(takeUntil(componentDestroyed$$))
-      .subscribe((charMappings) => {
-        const matcher = new CodeMatcher(charMappings);
+      .subscribe((charMappingDict) => {
+        const matcher = new CodeMatcher(charMappingDict);
         setCodeMatcher(matcher);
 
         matcher.typingCode$.pipe(takeUntil(componentDestroyed$$)).subscribe(setTypingCode);

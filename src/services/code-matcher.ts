@@ -2,7 +2,7 @@ import React from 'react';
 
 import { BehaviorSubject, Subject } from 'rxjs';
 
-import { CharMapping } from '../interfaces/char-mapping';
+import { CharMappingDict } from '../interfaces/char-mapping';
 import { isComposing } from '../utils/key-event-utils';
 
 export class CodeMatcher {
@@ -14,7 +14,7 @@ export class CodeMatcher {
   matchedChars$ = this.matchedChars$$.asObservable();
   char$ = this.char$$.asObservable();
 
-  constructor(private readonly charMappings: CharMapping[]) {}
+  constructor(private readonly charMappingDict: CharMappingDict) {}
 
   onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (event.metaKey || event.shiftKey || isComposing(event)) {
@@ -46,7 +46,7 @@ export class CodeMatcher {
 
   private updateMatchedChars(): void {
     const typingCode = this.typingCode$$.value;
-    const matchedChars = this.charMappings.filter(({ code }) => code === typingCode).map(({ char }) => char);
+    const matchedChars = this.charMappingDict[typingCode] || [];
     this.matchedChars$$.next(matchedChars);
   }
 

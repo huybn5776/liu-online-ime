@@ -12,6 +12,7 @@ export function loadCharMappings(): Observable<CharMappingDict> {
   return source.pipe(
     map((text) => resolveCharMapping(text)),
     map(charMappingsToDict),
+    map((charMappingDict) => appendUserDict(charMappingDict)),
   );
 }
 
@@ -46,4 +47,38 @@ function charMappingsToDict(charMappings: CharMapping[]): CharMappingDict {
     charMappingDict[charMapping.code] = [...(charMappingDict[charMapping.code] || []), charMapping.char];
   });
   return charMappingDict;
+}
+
+function appendUserDict(charMappingDict: CharMappingDict): CharMappingDict {
+  const userDictMappings = getUserDictFromLocalStorage();
+
+  const newCharMappingDict = {} as CharMappingDict;
+  userDictMappings?.forEach((charMapping) => {
+    newCharMappingDict[charMapping.code] = [
+      ...(newCharMappingDict[charMapping.code] || charMappingDict[charMapping.code] || []),
+      charMapping.char,
+    ];
+  });
+
+  return { ...charMappingDict, ...newCharMappingDict };
+}
+
+export function getUserDictFromLocalStorage(): CharMapping[] | null {
+  const userDictJson = localStorage.getItem('user-dict');
+  return userDictJson ? (JSON.parse(userDictJson) as CharMapping[]) : null;
+}
+
+export function saveUserDictToLocalStorage(userDict: CharMapping[] | undefined | null): void {
+  if (userDict) {
+    localStorage.setItem(
+      'user-dict',
+      JSON.stringify(
+        userDict
+          .filter((charMapping) => charMapping.code && charMapping.char)
+          .map(({ code, char }) => ({ code, char })),
+      ),
+    );
+  } else {
+    localStorage.removeItem('user-dict');
+  }
 }
