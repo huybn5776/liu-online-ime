@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import SettingTabContent from '../SettingTabContent/SettingTabContent';
+import UserDictSettings from '../UserDictSettings/UserDictSettings';
 import './SettingPage.scss';
 
 enum SettingTab {
@@ -23,7 +24,9 @@ const SettingsPage: React.FC = () => {
         </Link>
       </div>
       <SettingTabContent active={activeTab === SettingTab.general}>General</SettingTabContent>
-      <SettingTabContent active={activeTab === SettingTab.userDict}>UserDict</SettingTabContent>
+      <SettingTabContent active={activeTab === SettingTab.userDict}>
+        <UserDictSettings />
+      </SettingTabContent>
     </div>
   );
 

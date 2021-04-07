@@ -1,4 +1,5 @@
 export interface CharMapping {
+  id?: number;
   code: string;
   char: string;
 }
