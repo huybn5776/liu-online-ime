@@ -8,10 +8,12 @@ import './InputPage.scss';
 const InputPage: React.FC = () => {
   return (
     <div className="InputPage">
-      <ImeTextArea/>
-      <Link to="/settings" className="icon-button setting-page-link">
-        <i className="cog icon" />
-      </Link>
+      <div className="ime-input-container">
+        <ImeTextArea/>
+        <Link to="/settings" className="icon-button setting-page-link">
+          <i className="cog icon" />
+        </Link>
+      </div>
     </div>
   );
 };
