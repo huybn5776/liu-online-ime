@@ -26,6 +26,8 @@ export class CodeMatcher {
       this.onTypingCode(event);
     } else if (inputKey === 'Backspace') {
       this.handleBackspace(event);
+    } else if (inputKey === 'Escape') {
+      this.handleCancelInput(event);
     } else if (inputKey === ' ') {
       this.recognizeInput(event);
     } else if (inputKey.match(/\d/)) {
@@ -58,6 +60,11 @@ export class CodeMatcher {
 
     this.typingCode$$.next(typingCode.substring(0, typingCode.length - 1));
     this.updateMatchedChars();
+    event.preventDefault();
+  }
+
+  private handleCancelInput(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    this.clear();
     event.preventDefault();
   }
 
