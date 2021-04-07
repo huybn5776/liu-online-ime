@@ -11,7 +11,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <BrowserRouter>
-        <Route exact path="/" render={() => <Redirect to="/ime" />} />
+        <Route exact path="/" render={() => <Redirect to={`/ime${window.location.search}`} />} />
         <Route path="/ime">
           <InputPage />
         </Route>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
+import GeneralSettings from '../GenerialSettings/GeneralSettings';
 import SettingTabContent from '../SettingTabContent/SettingTabContent';
 import UserDictSettings from '../UserDictSettings/UserDictSettings';
 import './SettingPage.scss';
@@ -23,7 +24,9 @@ const SettingsPage: React.FC = () => {
           <i className="close icon" />
         </Link>
       </div>
-      <SettingTabContent active={activeTab === SettingTab.general}>General</SettingTabContent>
+      <SettingTabContent active={activeTab === SettingTab.general}>
+        <GeneralSettings />
+      </SettingTabContent>
       <SettingTabContent active={activeTab === SettingTab.userDict}>
         <UserDictSettings />
       </SettingTabContent>

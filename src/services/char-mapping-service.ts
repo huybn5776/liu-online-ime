@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { EMPTY, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -50,7 +51,7 @@ function charMappingsToDict(charMappings: CharMapping[]): CharMappingDict {
 }
 
 function appendUserDict(charMappingDict: CharMappingDict): CharMappingDict {
-  const userDictMappings = getUserDictFromLocalStorage();
+  const userDictMappings = getUserDictFromUrl() || getUserDictFromLocalStorage();
 
   const newCharMappingDict = {} as CharMappingDict;
   userDictMappings?.forEach((charMapping) => {
@@ -61,6 +62,19 @@ function appendUserDict(charMappingDict: CharMappingDict): CharMappingDict {
   });
 
   return { ...charMappingDict, ...newCharMappingDict };
+}
+
+export function getUserDictFromUrl(): CharMapping[] | null {
+  const userDictBase64 = new URL(window.location.href).searchParams.get('userDict');
+  if (!userDictBase64) {
+    return null;
+  }
+  return base64ToCharMappings(userDictBase64);
+}
+
+export function getUserDictAsBase64String(): string | null {
+  const userDict = getUserDictFromLocalStorage();
+  return userDict ? charMappingsToBase64(userDict) : null;
 }
 
 export function getUserDictFromLocalStorage(): CharMapping[] | null {
@@ -81,4 +95,16 @@ export function saveUserDictToLocalStorage(userDict: CharMapping[] | undefined |
   } else {
     localStorage.removeItem('user-dict');
   }
+}
+
+function charMappingsToBase64(charMappings: CharMapping[]): string {
+  return R.pipe(stringifyCharMappings, encodeURIComponent, btoa)(charMappings);
+}
+
+function base64ToCharMappings(base64String: string): CharMapping[] {
+  return R.pipe(atob, decodeURIComponent, resolveCharMapping)(base64String);
+}
+
+function stringifyCharMappings(charMappings: CharMapping[]): string {
+  return charMappings.map((charMapping) => `${charMapping.code}\t${charMapping.char}`).join('\n');
 }
