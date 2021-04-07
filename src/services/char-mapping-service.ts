@@ -75,7 +75,7 @@ export function saveUserDictToLocalStorage(userDict: CharMapping[] | undefined |
       JSON.stringify(
         userDict
           .filter((charMapping) => charMapping.code && charMapping.char)
-          .map(({ code, char }) => ({ code, char })),
+          .map(({ code, char }) => ({ code: code.trim(), char: char.trim() })),
       ),
     );
   } else {
