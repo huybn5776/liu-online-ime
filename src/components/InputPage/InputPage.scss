@@ -11,5 +11,22 @@
 .icon-button.setting-page-link {
   position: absolute;
   top: 4px;
-  right: 4px;
+  right: 6px;
+}
+
+.input-mode-button {
+  position: absolute;
+  right: 8px;
+  bottom: 12px;
+  padding: 4px;
+  background-color: aliceblue;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s;
+
+  &:hover {
+    background-color: azure;
+    border-color: gray;
+  }
 }

@@ -1,16 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { fromEvent, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 import { loadCharMappings } from '../../services/char-mapping-service';
 import { CodeMatcher } from '../../services/code-matcher';
 import './ImeTextArea.scss';
 
-const ImeTextArea: React.FC = () => {
+interface Props {
+  inputMode?: InputMode;
+  inputModeChange?: (inputMode: InputMode) => void;
+}
+
+export enum InputMode {
+  english = 'english',
+  chinese = 'chinese',
+}
+
+const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChange }: Props) => {
   const [codeMatcher, setCodeMatcher] = useState<CodeMatcher>();
   const [typingCode, setTypingCode] = useState('');
   const [matchedChars, setMatchedChars] = useState<string[]>([]);
+  const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
 
   const textArea = useRef<HTMLTextAreaElement | null>(null);
 
@@ -32,10 +43,11 @@ const ImeTextArea: React.FC = () => {
       componentDestroyed$$.complete();
     };
   }, []);
+  useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
 
   return (
     <div>
-      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown}/>
+      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown} />
       <p className="typing-code">{typingCode}</p>
       {matchedChars.length ? (
         <div className="char-chooser">
@@ -57,12 +69,41 @@ const ImeTextArea: React.FC = () => {
   );
 
   function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    if (event.key === 'Shift') {
+      handleShiftKey();
+    }
+    if (inputMode === InputMode.english) {
+      return;
+    }
+
     codeMatcher?.onKeyDown?.(event);
     if (event.isDefaultPrevented()) {
       return;
     }
 
     handleCopy(event);
+  }
+
+  function handleShiftKey(): void {
+    if (!textArea.current) {
+      return;
+    }
+    fromEvent<KeyboardEvent>(textArea.current, 'keyup')
+      .pipe(
+        take(1),
+        takeUntil(fromEvent(textArea.current, 'keydown')),
+        filter((event) => event.key === 'Shift'),
+      )
+      .subscribe(() => {
+        const nextInputModeMap: Record<InputMode, InputMode> = {
+          [InputMode.chinese]: InputMode.english,
+          [InputMode.english]: InputMode.chinese,
+        };
+        const nextInputMode = nextInputModeMap[inputMode];
+        setInputMode(nextInputMode);
+        inputModeChange?.(nextInputMode);
+        codeMatcher?.clear();
+      });
   }
 
   function handleCopy(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
