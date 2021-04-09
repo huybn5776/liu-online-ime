@@ -54,7 +54,7 @@ const UserDictSettings: React.FC = () => {
               key={charMapping.id + colDefine.field}
               value={charMapping[colDefine.field]}
               maxLength={colDefine.maxLength}
-              tabIndex={cellIndex}
+              tabIndex={cellIndex + 1}
               onChange={(event) => onUserDictRowChange(rowIndex, { [colDefine.field]: event.target.value })}
               onKeyDown={(event) => onUserDictInputKeyDown(event, charMapping, rowIndex)}
               onFocus={() => setFocusIndex(cellIndex)}
