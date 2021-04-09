@@ -73,8 +73,10 @@ export class CodeMatcher {
     if (firstMatch) {
       this.char$$.next(firstMatch);
     }
-    this.clear();
-    event.preventDefault();
+    if (firstMatch || this.typingCode$$.value) {
+      this.clear();
+      event.preventDefault();
+    }
   }
 
   private sendMatchedChar(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
