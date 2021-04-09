@@ -68,6 +68,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
     };
   }, []);
   useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
+  useEffect(() => textArea.current?.focus(), [textArea]);
 
   return (
     <div>
