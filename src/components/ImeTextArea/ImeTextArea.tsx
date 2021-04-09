@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { fromEvent, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { bufferCount, filter, take, takeUntil } from 'rxjs/operators';
 
 import { loadCharMappings } from '../../services/char-mapping-service';
 import { CodeMatcher } from '../../services/code-matcher';
+import CaretPosition from '../CaretPosition/CaretPosition';
 import CharChooser from '../CharChooser/CharChooser';
 import './ImeTextArea.scss';
 
@@ -24,20 +25,42 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
   const [matchedChars, setMatchedChars] = useState<string[]>([]);
   const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
 
-  const textArea = useRef<HTMLTextAreaElement | null>(null);
+  const caretPositionComponent = useRef<React.ElementRef<typeof CaretPosition>>(null);
+  const textArea = useRef<HTMLTextAreaElement>(null);
+  const charChooser = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const componentDestroyed$$ = new Subject();
+    const typingCode$$ = new Subject<string>();
+
     loadCharMappings()
       .pipe(takeUntil(componentDestroyed$$))
       .subscribe((charMappingDict) => {
         const matcher = new CodeMatcher(charMappingDict);
         setCodeMatcher(matcher);
 
-        matcher.typingCode$.pipe(takeUntil(componentDestroyed$$)).subscribe(setTypingCode);
+        matcher.typingCode$.pipe(takeUntil(componentDestroyed$$)).subscribe((code) => {
+          setTypingCode(code);
+          typingCode$$.next(code);
+        });
         matcher.matchedChars$.pipe(takeUntil(componentDestroyed$$)).subscribe(setMatchedChars);
         matcher.char$.pipe(takeUntil(componentDestroyed$$)).subscribe(onCharSend);
       });
+
+    const startTypingCode$ = typingCode$$.pipe(
+      bufferCount(2, 1),
+      filter(([lastCode, currentCode]) => !lastCode && !!currentCode),
+    );
+    startTypingCode$.subscribe(() => {
+      const charChooserElement = charChooser.current;
+      const position = caretPositionComponent.current?.getPosition();
+      if (!charChooserElement || !position) {
+        return;
+      }
+
+      charChooserElement.style.left = `${position.x}px`;
+      charChooserElement.style.top = `${position.y}px`;
+    });
 
     return () => {
       componentDestroyed$$.next();
@@ -48,11 +71,11 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
 
   return (
     <div>
-      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown} />
+      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown}/>
+      <CaretPosition passive ref={caretPositionComponent} textArea={textArea.current} />
+
       <p className="typing-code">{typingCode}</p>
-      {matchedChars.length ? (
-        <CharChooser matchedChars={matchedChars} />
-      ) : null}
+      <CharChooser ref={charChooser} matchedChars={matchedChars} />
     </div>
   );
 

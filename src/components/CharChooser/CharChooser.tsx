@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { forwardRef, memo } from 'react';
 
 import './CharChooser.scss';
 
@@ -6,9 +6,9 @@ interface Props {
   matchedChars: string[];
 }
 
-const CharChooser: React.FC<Props> = ({ matchedChars }: Props) => {
+const CharChooser: React.ForwardRefRenderFunction<HTMLDivElement, Props> = ({ matchedChars }: Props, ref) => {
   return (
-    <div className="CharChooser" >
+    <div className="CharChooser" ref={ref} hidden={!matchedChars.length}>
       <ul className="matched-char-list">
         {matchedChars.map((matchedChar) => (
           <li className="matched-char-item" key={matchedChar}>
@@ -25,4 +25,4 @@ const CharChooser: React.FC<Props> = ({ matchedChars }: Props) => {
   );
 };
 
-export default memo(CharChooser);
+export default memo(forwardRef(CharChooser));
