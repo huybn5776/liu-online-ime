@@ -9,6 +9,7 @@ import { getCounter } from '../../utils/counter-utils';
 
 interface ColDefine<T> {
   field: keyof T;
+  maxLength?: number;
 }
 
 const UserDictSettings: React.FC = () => {
@@ -35,7 +36,7 @@ const UserDictSettings: React.FC = () => {
       <p className="user-dict-grid-header" />
       <p className="user-dict-grid-header">拆碼 (最多5碼)</p>
       <p className="user-dict-grid-header">對應字詞</p>
-      {renderRows(userDict, [{ field: 'code' }, { field: 'char' }])}
+      {renderRows(userDict, [{ field: 'code', maxLength: 5 }, { field: 'char' }])}
     </div>
   );
 
@@ -52,6 +53,7 @@ const UserDictSettings: React.FC = () => {
               type="text"
               key={charMapping.id + colDefine.field}
               value={charMapping[colDefine.field]}
+              maxLength={colDefine.maxLength}
               tabIndex={cellIndex}
               onChange={(event) => onUserDictRowChange(rowIndex, { [colDefine.field]: event.target.value })}
               onKeyDown={(event) => onUserDictInputKeyDown(event, charMapping, rowIndex)}

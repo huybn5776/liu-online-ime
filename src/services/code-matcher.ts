@@ -41,8 +41,10 @@ export class CodeMatcher {
   }
 
   private onTypingCode(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    this.typingCode$$.next(this.typingCode$$.value + event.key);
-    this.updateMatchedChars();
+    if (this.typingCode$$.value.length < 5) {
+      this.typingCode$$.next(this.typingCode$$.value + event.key);
+      this.updateMatchedChars();
+    }
     event.preventDefault();
   }
 
