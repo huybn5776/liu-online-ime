@@ -5,6 +5,7 @@ import { take, takeUntil } from 'rxjs/operators';
 
 import { loadCharMappings } from '../../services/char-mapping-service';
 import { CodeMatcher } from '../../services/code-matcher';
+import CharChooser from '../CharChooser/CharChooser';
 import './ImeTextArea.scss';
 
 interface Props {
@@ -50,20 +51,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
       <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown} />
       <p className="typing-code">{typingCode}</p>
       {matchedChars.length ? (
-        <div className="char-chooser">
-          <ul className="matched-char-list">
-            {matchedChars.map((matchedChar) => (
-              <li className="matched-char-item" key={matchedChar}>
-                {matchedChar}
-              </li>
-            ))}
-          </ul>
-
-          <div className="state-line">
-            <span className="number-key-label">數字鍵</span>
-            <span className="pagination-label">(1/1)</span>
-          </div>
-        </div>
+        <CharChooser matchedChars={matchedChars} />
       ) : null}
     </div>
   );

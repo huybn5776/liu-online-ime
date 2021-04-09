@@ -1,0 +1,52 @@
+.CharChooser {
+  width: 300px;
+  padding: 0 6px 0 12px;
+  background: white;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  box-shadow: 0 0 16px 1px rgba(0, 0, 0, .2);
+}
+
+.matched-char-list {
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: char-index -1;
+}
+
+.matched-char-item {
+  display: inline;
+  font-size: 16px;
+
+  &::before {
+    margin-right: 2px;
+    color: #686868;
+    font-size: 12px;
+    content: counter(char-index) '.';
+    counter-increment: char-index;
+  }
+
+  & + & {
+    margin-left: 12px;
+  }
+}
+
+.state-line {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  height: 16px;
+  color: #999;
+}
+
+.number-key-label {
+  display: inline-block;
+  font-size: 12px;
+  transform: scale(.7);
+  transform-origin: 0 0;
+}
+
+.pagination-label {
+  display: inline-block;
+  transform: scale(.6);
+  transform-origin: 100% 0;
+}
