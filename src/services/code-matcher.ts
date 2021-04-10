@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { BehaviorSubject, Subject } from 'rxjs';
+import { bufferCount, filter, shareReplay } from 'rxjs/operators';
 
 import { CharMappingDict } from '../interfaces/char-mapping';
 import { isComposing } from '../utils/key-event-utils';
@@ -9,10 +10,21 @@ export class CodeMatcher {
   private typingCode$$ = new BehaviorSubject<string>('');
   private matchedChars$$ = new BehaviorSubject<string[]>([]);
   private char$$ = new Subject<string>();
+  private cancel$$ = new Subject<void>();
 
   typingCode$ = this.typingCode$$.asObservable();
   matchedChars$ = this.matchedChars$$.asObservable();
   char$ = this.char$$.asObservable();
+  cancel$ = this.cancel$$.asObservable();
+  startTypingCode$ = this.typingCode$$.pipe(
+    bufferCount(2, 1),
+    filter(([lastCode, currentCode]) => !lastCode && !!currentCode),
+    shareReplay(1),
+  );
+  stopTypingCode$ = this.typingCode$$.pipe(
+    bufferCount(2, 1),
+    filter(([lastCode, currentCode]) => !!lastCode && !currentCode),
+  );
 
   constructor(private readonly charMappingDict: CharMappingDict) {}
 
@@ -66,6 +78,7 @@ export class CodeMatcher {
   }
 
   private handleCancelInput(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    this.cancel$$.next();
     this.clear();
     event.preventDefault();
   }
@@ -74,6 +87,8 @@ export class CodeMatcher {
     const firstMatch = this.matchedChars$$.value[0];
     if (firstMatch) {
       this.char$$.next(firstMatch);
+    } else {
+      this.cancel$$.next();
     }
     if (firstMatch || this.typingCode$$.value) {
       this.clear();

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { fromEvent, Subject } from 'rxjs';
-import { bufferCount, filter, take, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 import { loadCharMappings } from '../../services/char-mapping-service';
 import { CodeMatcher } from '../../services/code-matcher';
+import { TypingCodePreview } from '../../services/typing-code-preview';
 import CaretFollowWrapper from '../CaretPositionWrapper/CaretFollowWrapper';
 import CharChooser from '../CharChooser/CharChooser';
 import './ImeTextArea.scss';
@@ -20,51 +21,65 @@ export enum InputMode {
 }
 
 const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChange }: Props) => {
-  const [codeMatcher, setCodeMatcher] = useState<CodeMatcher>();
   const [typingCode, setTypingCode] = useState('');
   const [matchedChars, setMatchedChars] = useState<string[]>([]);
   const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
+  const [textArea, setTextArea] = useState<HTMLTextAreaElement | null>(null);
 
   const caretFollowWrapper = useRef<React.ElementRef<typeof CaretFollowWrapper>>(null);
-  const textArea = useRef<HTMLTextAreaElement>(null);
+
+  const codeMatcher$$ = useRef(new BehaviorSubject<CodeMatcher | null>(null));
+  const codeMatcher$ = useRef<Observable<CodeMatcher>>(
+    codeMatcher$$.current.pipe(filter((matcher) => matcher !== null)) as Observable<CodeMatcher>,
+  );
 
   useEffect(() => {
-    const componentDestroyed$$ = new Subject();
-    const typingCode$$ = new Subject<string>();
+    const subscription = loadCharMappings().subscribe((charMappingDict) => {
+      codeMatcher$$.current.next(new CodeMatcher(charMappingDict));
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
-    loadCharMappings()
-      .pipe(takeUntil(componentDestroyed$$))
-      .subscribe((charMappingDict) => {
-        const matcher = new CodeMatcher(charMappingDict);
-        setCodeMatcher(matcher);
+  useEffect(() => {
+    if (!textArea) {
+      return () => {};
+    }
+    textArea.focus();
 
-        matcher.typingCode$.pipe(takeUntil(componentDestroyed$$)).subscribe((code) => {
-          setTypingCode(code);
-          typingCode$$.next(code);
+    const textAreaUpdated$$ = new Subject<void>();
+
+    codeMatcher$.current.subscribe((codeMatcher) => {
+      const typingCodePreview = new TypingCodePreview(textArea, codeMatcher);
+
+      codeMatcher.typingCode$.pipe(takeUntil(textAreaUpdated$$)).subscribe((code) => setTypingCode(code));
+      codeMatcher.matchedChars$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setMatchedChars);
+      codeMatcher.startTypingCode$.subscribe(() => {
+        typingCodePreview.deleteSelectedText();
+        caretFollowWrapper.current?.updatePosition();
+        typingCodePreview.startTyping();
+
+        textAreaUpdated$$.subscribe(() => {
+          codeMatcher.clear();
+          setTypingCode('');
+          setMatchedChars([]);
+          typingCodePreview.dispose();
         });
-        matcher.matchedChars$.pipe(takeUntil(componentDestroyed$$)).subscribe(setMatchedChars);
-        matcher.char$.pipe(takeUntil(componentDestroyed$$)).subscribe(onCharSend);
       });
-
-    const startTypingCode$ = typingCode$$.pipe(
-      bufferCount(2, 1),
-      filter(([lastCode, currentCode]) => !lastCode && !!currentCode),
-    );
-    startTypingCode$.subscribe(() => caretFollowWrapper.current?.updatePosition());
+    });
 
     return () => {
-      componentDestroyed$$.next();
-      componentDestroyed$$.complete();
+      textAreaUpdated$$.next();
+      textAreaUpdated$$.complete();
     };
-  }, []);
+  }, [textArea]);
+
   useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
-  useEffect(() => textArea.current?.focus(), [textArea]);
 
   return (
-    <div>
-      <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown}/>
-      <p className="typing-code">{typingCode}</p>
-      <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea.current}>
+    <div className="ImeTextArea">
+      <textarea className="ime-textarea" ref={setTextArea} onKeyDown={onKeyDown} />
+      <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea}>
+        <p className="typing-code">{typingCode}</p>
         <CharChooser matchedChars={matchedChars} />
       </CaretFollowWrapper>
     </div>
@@ -78,7 +93,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
       return;
     }
 
-    codeMatcher?.onKeyDown?.(event);
+    codeMatcher$$.current?.value?.onKeyDown?.(event);
     if (event.isDefaultPrevented()) {
       return;
     }
@@ -87,13 +102,13 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
   }
 
   function handleShiftKey(): void {
-    if (!textArea.current) {
+    if (!textArea) {
       return;
     }
-    fromEvent<KeyboardEvent>(textArea.current, 'keyup')
+    fromEvent<KeyboardEvent>(textArea, 'keyup')
       .pipe(
         take(1),
-        takeUntil(fromEvent(textArea.current, 'keydown')),
+        takeUntil(fromEvent(textArea, 'keydown')),
         filter((event) => event.key === 'Shift'),
       )
       .subscribe(() => {
@@ -104,34 +119,22 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
         const nextInputMode = nextInputModeMap[inputMode];
         setInputMode(nextInputMode);
         inputModeChange?.(nextInputMode);
-        codeMatcher?.clear();
+        codeMatcher$$.current?.value?.clear();
       });
   }
 
   function handleCopy(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    if (!((event.metaKey || event.ctrlKey || event.altKey) && event.key === 'Enter' && textArea.current)) {
+    if (!((event.metaKey || event.ctrlKey || event.altKey) && event.key === 'Enter' && textArea)) {
       return;
     }
 
-    textArea.current.select();
+    textArea.select();
     document.execCommand('copy');
     event.preventDefault();
 
     if (event.shiftKey) {
-      textArea.current.value = '';
+      textArea.value = '';
     }
-  }
-
-  function onCharSend(char: string): void {
-    const textAreaElement = textArea.current;
-    if (!textAreaElement) {
-      return;
-    }
-
-    const cursorPosition = textAreaElement.selectionStart + char.length;
-    const { value, selectionStart, selectionEnd } = textAreaElement;
-    textAreaElement.value = value.slice(0, selectionStart) + char + value.slice(selectionEnd);
-    textAreaElement.setSelectionRange(cursorPosition, cursorPosition);
   }
 };
 

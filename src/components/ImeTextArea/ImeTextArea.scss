@@ -1,9 +1,19 @@
-.ime-textarea {
-  padding: 6px 4px;
+.ImeTextArea {
   font-size: 16px;
 }
 
+.ime-textarea {
+  padding: 6px 4px;
+}
+
 .typing-code {
-  margin: 4px;
+  position: absolute;
+  margin-left: 1px;
+  color: transparent;
   text-transform: uppercase;
+  text-decoration: underline;
+  border: 0;
+  border-bottom: 1px solid black;
+  outline: 0;
+  transform: translateY(-100%);
 }
