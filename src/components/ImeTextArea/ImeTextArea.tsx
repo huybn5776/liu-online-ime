@@ -5,7 +5,7 @@ import { bufferCount, filter, take, takeUntil } from 'rxjs/operators';
 
 import { loadCharMappings } from '../../services/char-mapping-service';
 import { CodeMatcher } from '../../services/code-matcher';
-import CaretPosition from '../CaretPosition/CaretPosition';
+import CaretFollowWrapper from '../CaretPositionWrapper/CaretFollowWrapper';
 import CharChooser from '../CharChooser/CharChooser';
 import './ImeTextArea.scss';
 
@@ -25,9 +25,8 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
   const [matchedChars, setMatchedChars] = useState<string[]>([]);
   const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
 
-  const caretPositionComponent = useRef<React.ElementRef<typeof CaretPosition>>(null);
+  const caretFollowWrapper = useRef<React.ElementRef<typeof CaretFollowWrapper>>(null);
   const textArea = useRef<HTMLTextAreaElement>(null);
-  const charChooser = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const componentDestroyed$$ = new Subject();
@@ -51,16 +50,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
       bufferCount(2, 1),
       filter(([lastCode, currentCode]) => !lastCode && !!currentCode),
     );
-    startTypingCode$.subscribe(() => {
-      const charChooserElement = charChooser.current;
-      const position = caretPositionComponent.current?.getPosition();
-      if (!charChooserElement || !position) {
-        return;
-      }
-
-      charChooserElement.style.left = `${position.x}px`;
-      charChooserElement.style.top = `${position.y}px`;
-    });
+    startTypingCode$.subscribe(() => caretFollowWrapper.current?.updatePosition());
 
     return () => {
       componentDestroyed$$.next();
@@ -73,10 +63,10 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
   return (
     <div>
       <textarea className="ime-textarea" ref={textArea} onKeyDown={onKeyDown}/>
-      <CaretPosition passive ref={caretPositionComponent} textArea={textArea.current} />
-
       <p className="typing-code">{typingCode}</p>
-      <CharChooser ref={charChooser} matchedChars={matchedChars} />
+      <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea.current}>
+        <CharChooser matchedChars={matchedChars} />
+      </CaretFollowWrapper>
     </div>
   );
 
