@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 import { filter, take, takeUntil } from 'rxjs/operators';
 
-import { loadCharMappings } from '../../services/char-mapping-service';
+import { loadCharMappings } from '../../services/char-mapping';
 import { CodeMatcher } from '../../services/code-matcher';
 import { TypingCodePreview } from '../../services/typing-code-preview';
 import CaretFollowWrapper from '../CaretPositionWrapper/CaretFollowWrapper';

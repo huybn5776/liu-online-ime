@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 
-import { getUserDictAsBase64String } from '../../services/char-mapping-service';
+import { getUserDictAsBase64String } from '../../services/char-mapping/user-dict-char-mapping-service';
 import './GeneralSettings.scss';
 
 const GeneralSettings: React.FC = () => {
