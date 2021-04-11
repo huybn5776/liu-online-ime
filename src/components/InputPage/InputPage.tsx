@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { Link } from 'react-router-dom';
-
+import AppLink from '../AppLink/AppLink';
 import ImeTextArea, { InputMode } from '../ImeTextArea/ImeTextArea';
 import './InputPage.scss';
 
@@ -16,9 +15,12 @@ const InputPage: React.FC = () => {
     <div className="InputPage">
       <div className="ime-input-container">
         <ImeTextArea inputMode={inputMode} inputModeChange={setInputMode} />
-        <Link to="/settings" className="icon-button setting-page-link">
+        <AppLink className="icon-button setting-page-link" to="/settings" withParas>
           <i className="cog icon" />
-        </Link>
+        </AppLink>
+        <AppLink className="icon-button setting-page-link" to="/settings" withParas>
+          <i className="cog icon" />
+        </AppLink>
         <button className="input-mode-button" type="button" onClick={toggleInputMode}>
           {inputModeLabel[inputMode]}
         </button>

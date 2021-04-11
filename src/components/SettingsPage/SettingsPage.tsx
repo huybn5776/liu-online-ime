@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { Link } from 'react-router-dom';
-
+import AppLink from '../AppLink/AppLink';
 import GeneralSettings from '../GenerialSettings/GeneralSettings';
 import SettingTabContent from '../SettingTabContent/SettingTabContent';
 import UserDictSettings from '../UserDictSettings/UserDictSettings';
@@ -20,9 +19,9 @@ const SettingsPage: React.FC = () => {
       <div className="ui top attached tabular menu">
         {renderTabButton(SettingTab.general, '一般設定')}
         {renderTabButton(SettingTab.userDict, '加字加詞')}
-        <Link className="icon-button setting-page-close-button" to="/">
+        <AppLink className="icon-button setting-page-close-button" to="/" withParas>
           <i className="close icon" />
-        </Link>
+        </AppLink>
       </div>
       <SettingTabContent active={activeTab === SettingTab.general}>
         <GeneralSettings />
