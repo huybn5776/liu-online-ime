@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/hliu/liu-uni.js", "destination": "https://boshiamy.com/hliu/liu-uni.js" }]
+}
