@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 
-import AppLink from '../AppLink/AppLink';
 import ImeTextArea, { InputMode } from '../ImeTextArea/ImeTextArea';
+import ToolbarClear from '../toolbar-buttons/ToolbarClear/ToolbarClear';
+import ToolbarCopyAll from '../toolbar-buttons/ToolbarCopyAll/ToolbarCopyAll';
+import ToolbarCopyAndClear from '../toolbar-buttons/ToolbarCopyAndClear/ToolbarCopyAndClear';
+import ToolbarExpandToggle from '../toolbar-buttons/ToolbarExpandToggle/ToolbarExpandToggle';
+import ToolbarGoToSetting from '../toolbar-buttons/ToolbarGoToSetting/ToolbarGoToSetting';
+import ToolbarSwitchInputMode from '../toolbar-buttons/ToolbarSwitchInputMode/ToolbarSwitchInputMode';
 import './InputPage.scss';
 
 const InputPage: React.FC = () => {
@@ -10,20 +15,26 @@ const InputPage: React.FC = () => {
     [InputMode.chinese]: '嘸',
     [InputMode.english]: 'Ａ',
   });
+  const [value, setValue] = useState('');
+  const [toolbarExpanded, setToolbarExpanded] = useState(true);
 
   return (
     <div className="InputPage">
       <div className="ime-input-container">
-        <ImeTextArea inputMode={inputMode} inputModeChange={setInputMode} />
-        <AppLink className="icon-button setting-page-link" to="/settings" withParas>
-          <i className="cog icon" />
-        </AppLink>
-        <AppLink className="icon-button setting-page-link" to="/settings" withParas>
-          <i className="cog icon" />
-        </AppLink>
-        <button className="input-mode-button" type="button" onClick={toggleInputMode}>
-          {inputModeLabel[inputMode]}
-        </button>
+        <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode}/>
+      </div>
+
+      <div className={`bottom-toolbar${toolbarExpanded ? ' expand' : ''}`}>
+        <ToolbarSwitchInputMode
+          expand={toolbarExpanded}
+          modeLabel={inputModeLabel[inputMode]}
+          onClick={toggleInputMode}
+        />
+        <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll}/>
+        <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
+        <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
+        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={setToolbarExpanded}/>
+        <ToolbarGoToSetting className="setting-button" expand={toolbarExpanded}/>
       </div>
     </div>
   );
@@ -34,6 +45,19 @@ const InputPage: React.FC = () => {
       [InputMode.english]: InputMode.chinese,
     };
     setInputMode(nextInputModeMap[inputMode]);
+  }
+
+  function copyAll(): void {
+    navigator.clipboard.writeText(value);
+  }
+
+  function clear(): void {
+    setValue('');
+  }
+
+  function copyAndClear(): void {
+    copyAll();
+    clear();
   }
 };
 

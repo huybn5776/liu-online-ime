@@ -11,6 +11,8 @@ import CharChooser from '../CharChooser/CharChooser';
 import './ImeTextArea.scss';
 
 interface Props {
+  value?: string;
+  onValueChange?: (value: string) => void;
   inputMode?: InputMode;
   inputModeChange?: (inputMode: InputMode) => void;
 }
@@ -20,7 +22,7 @@ export enum InputMode {
   chinese = 'chinese',
 }
 
-const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChange }: Props) => {
+const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsInputMode, inputModeChange }: Props) => {
   const [typingCode, setTypingCode] = useState('');
   const [matchedChars, setMatchedChars] = useState<string[]>([]);
   const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
@@ -32,6 +34,12 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
   const codeMatcher$ = useRef<Observable<CodeMatcher>>(
     codeMatcher$$.current.pipe(filter((matcher) => matcher !== null)) as Observable<CodeMatcher>,
   );
+
+  useEffect(() => {
+    if (textArea) {
+      textArea.value = value || '';
+    }
+  }, [textArea, value]);
 
   useEffect(() => {
     const subscription = loadCharMappings().subscribe((charMappingDict) => {
@@ -57,6 +65,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
         typingCodePreview.deleteSelectedText();
         caretFollowWrapper.current?.updatePosition();
         typingCodePreview.startTyping();
+        typingCodePreview.value$.pipe(takeUntil(codeMatcher.stopTypingCode$)).subscribe(onValueChange);
 
         textAreaUpdated$$.subscribe(() => {
           codeMatcher.clear();
@@ -71,7 +80,7 @@ const ImeTextArea: React.FC<Props> = ({ inputMode: propsInputMode, inputModeChan
       textAreaUpdated$$.next();
       textAreaUpdated$$.complete();
     };
-  }, [textArea]);
+  }, [textArea, onValueChange]);
 
   useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
 

@@ -16,25 +16,17 @@
   }
 }
 
-.icon-button.setting-page-link {
-  position: absolute;
-  top: 4px;
-  right: 6px;
+.bottom-toolbar {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  padding: 4px;
+  overflow-x: auto;
+  background-color: #f8f8f8;
+  border: 1px solid #d1d1d1;
+  border-top: 0;
 }
 
-.input-mode-button {
-  position: absolute;
-  right: 8px;
-  bottom: 12px;
-  padding: 4px;
-  background-color: aliceblue;
-  border: 1px solid lightgray;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color .2s, border-color .2s;
-
-  &:hover {
-    background-color: azure;
-    border-color: gray;
-  }
+.setting-button {
+  margin-left: auto;
 }

@@ -7,6 +7,9 @@ export class TypingCodePreview {
   private value = '';
   private selectionStart = 0;
   private dispose$$ = new Subject<void>();
+  private value$$ = new Subject<string>();
+
+  value$ = this.value$$.asObservable();
 
   constructor(private readonly textArea: HTMLTextAreaElement, private readonly codeMatcher: CodeMatcher) {}
 
@@ -29,20 +32,34 @@ export class TypingCodePreview {
   }
 
   private handleTextInsert(): void {
-    merge(
-      this.codeMatcher.typingCode$.pipe(
+    this.codeMatcher.typingCode$
+      .pipe(
         takeUntil(this.codeMatcher.char$),
+        takeUntil(this.dispose$$),
+        takeUntil(this.codeMatcher.stopTypingCode$),
         map((code) => code.toUpperCase()),
-      ),
-      this.codeMatcher.char$?.pipe(take(1)),
-    )
-      .pipe(takeUntil(this.dispose$$), takeUntil(this.codeMatcher.stopTypingCode$))
+      )
       .subscribe((texToInsert) => {
-        this.textArea.value =
-          this.value.slice(0, this.selectionStart) + texToInsert + this.value.slice(this.selectionStart);
-        const cursorPosition = this.selectionStart + texToInsert.length;
-        this.textArea.setSelectionRange(cursorPosition, cursorPosition);
+        this.insertTextToTextArea(texToInsert);
       });
+    this.codeMatcher.char$
+      .pipe(take(1))
+      .pipe(
+        takeUntil(merge(this.dispose$$, this.codeMatcher.stopTypingCode$)),
+        take(1),
+        map((code) => code.toUpperCase()),
+      )
+      .subscribe((texToInsert) => {
+        this.insertTextToTextArea(texToInsert);
+        this.value$$.next(this.textArea.value);
+      });
+  }
+
+  private insertTextToTextArea(texToInsert: string): void {
+    this.textArea.value =
+      this.value.slice(0, this.selectionStart) + texToInsert + this.value.slice(this.selectionStart);
+    const cursorPosition = this.selectionStart + texToInsert.length;
+    this.textArea.setSelectionRange(cursorPosition, cursorPosition);
   }
 
   private handleTextRestore(): void {
