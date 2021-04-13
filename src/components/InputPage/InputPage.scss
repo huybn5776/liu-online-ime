@@ -1,13 +1,14 @@
 .InputPage {
   display: grid;
   grid-template-rows: 1fr auto;
+  max-width: 1000px;
   height: calc(100vh - 8px * 2);
   max-height: 400px;
+  margin: 0 auto;
 }
 
 .ime-input-container {
   position: relative;
-  max-width: 978px;
   height: 100%;
 
   & .ime-textarea {
