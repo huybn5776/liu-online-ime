@@ -1,3 +1,7 @@
+.SettingsPage {
+  position: relative;
+}
+
 .setting-tab-button:focus {
   outline: 0;
 }
@@ -7,4 +11,11 @@
   width: 32px;
   height: 32px;
   margin-left: auto;
+}
+
+.github-link-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
 }
