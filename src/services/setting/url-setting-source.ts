@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 
+import { isNilOrEmpty } from '../../utils/object-utils';
 import { Settings, SettingSource } from './index';
 
 function get<P extends keyof Settings, T = Settings[P]>(settingKey: P): T | null {
@@ -19,8 +20,18 @@ function getAll(): Partial<Settings> {
   return R.pipe(atob, decodeURIComponent, JSON.parse)(base64String) as Settings;
 }
 
-export const urlSettingSource: SettingSource = {
+function settingsToBase64String(settings: Partial<Settings>): string | null {
+  if (isNilOrEmpty(settings)) {
+    return null;
+  }
+  return R.pipe(JSON.stringify, encodeURIComponent, btoa)(settings);
+}
+
+export const urlSettingSource: SettingSource & {
+  settingsToBase64String: typeof settingsToBase64String;
+} = {
   get,
   set,
   getAll,
+  settingsToBase64String,
 };

@@ -1,3 +1,4 @@
+import { isNilOrEmpty } from '../../utils/object-utils';
 import { defaultSettingValue, Settings, SettingSource } from './index';
 import { localStorageSettingSource } from './local-storage-setting-source';
 import { urlSettingSource } from './url-setting-source';
@@ -21,4 +22,13 @@ export function setSetting<P extends keyof Settings, T = Settings[P]>(settingKey
 
 export function getAllSettings(): Partial<Settings> {
   return settingSource.getAll();
+}
+
+export function getAllSettingsAsBase64String(): string | null {
+  const settings = localStorageSettingSource.getAll();
+  if (isNilOrEmpty(settings)) {
+    return null;
+  }
+
+  return urlSettingSource.settingsToBase64String(settings);
 }

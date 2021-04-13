@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 import { getUserDictAsBase64String } from '../../services/char-mapping/user-dict-char-mapping-service';
+import { getAllSettingsAsBase64String } from '../../services/setting/setting-service';
 import './GeneralSettings.scss';
 
 const GeneralSettings: React.FC = () => {
@@ -48,6 +49,11 @@ const GeneralSettings: React.FC = () => {
     const userDict = getUserDictAsBase64String();
     if (userDict) {
       url.searchParams.append('userDict', userDict);
+    }
+
+    const settingsBase64String = getAllSettingsAsBase64String();
+    if (settingsBase64String) {
+      url.searchParams.append('settings', settingsBase64String);
     }
 
     return url.href;
