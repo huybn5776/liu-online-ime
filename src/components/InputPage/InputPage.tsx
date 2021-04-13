@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { SettingKey } from '../../services/setting';
+import { getSetting, setSetting } from '../../services/setting/setting-service';
 import ImeTextArea, { InputMode } from '../ImeTextArea/ImeTextArea';
 import ToolbarClear from '../toolbar-buttons/ToolbarClear/ToolbarClear';
 import ToolbarCopyAll from '../toolbar-buttons/ToolbarCopyAll/ToolbarCopyAll';
@@ -16,7 +18,7 @@ const InputPage: React.FC = () => {
     [InputMode.english]: 'Ａ',
   });
   const [value, setValue] = useState('');
-  const [toolbarExpanded, setToolbarExpanded] = useState(true);
+  const [toolbarExpanded, setToolbarExpanded] = useState<boolean>(getSetting(SettingKey.toolbarExpanded));
 
   return (
     <div className="InputPage">
@@ -33,7 +35,7 @@ const InputPage: React.FC = () => {
         <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll}/>
         <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
         <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
-        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={setToolbarExpanded}/>
+        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick}/>
         <ToolbarGoToSetting className="setting-button" expand={toolbarExpanded}/>
       </div>
     </div>
@@ -58,6 +60,12 @@ const InputPage: React.FC = () => {
   function copyAndClear(): void {
     copyAll();
     clear();
+  }
+
+  function onExpandToggleClick(): void {
+    const expand = !toolbarExpanded;
+    setToolbarExpanded(expand);
+    setSetting(SettingKey.toolbarExpanded, expand);
   }
 };
 

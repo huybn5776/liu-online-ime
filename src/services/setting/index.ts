@@ -1,7 +1,9 @@
 export enum SettingKey {
+  toolbarExpanded = 'toolbarExpanded',
 }
 
 export const defaultSettingValue = {
+  toolbarExpanded: true,
 };
 
 export type Settings = typeof defaultSettingValue;
