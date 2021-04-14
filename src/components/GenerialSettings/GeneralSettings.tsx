@@ -44,10 +44,11 @@ const GeneralSettings: React.FC = () => {
   );
 
   function settingsToUrl(): string {
-    const siteUrl = window.location.origin;
-    const url = new URL(siteUrl);
+    const currentUrl = new URL(window.location.href);
+    const url = new URL(currentUrl.origin);
 
     const searchParams = {
+      cin: currentUrl.searchParams.get('cin'),
       userDict: getUserDictAsBase64String(),
       settings: getAllSettingsAsBase64String(),
     };
