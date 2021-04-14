@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { getUserDictAsBase64String } from '../../services/char-mapping/user-dict-char-mapping-service';
 import { getAllSettingsAsBase64String } from '../../services/setting/setting-service';
 import './GeneralSettings.scss';
+import { isNotNilOrEmpty } from '../../utils/object-utils';
 
 const GeneralSettings: React.FC = () => {
   const [settingUrl, setSettingUrl] = useState('');
@@ -46,15 +47,15 @@ const GeneralSettings: React.FC = () => {
     const siteUrl = window.location.origin;
     const url = new URL(siteUrl);
 
-    const userDict = getUserDictAsBase64String();
-    if (userDict) {
-      url.searchParams.append('userDict', userDict);
-    }
-
-    const settingsBase64String = getAllSettingsAsBase64String();
-    if (settingsBase64String) {
-      url.searchParams.append('settings', settingsBase64String);
-    }
+    const searchParams = {
+      userDict: getUserDictAsBase64String(),
+      settings: getAllSettingsAsBase64String(),
+    };
+    Object.entries(searchParams)
+      .filter(([, value]) => isNotNilOrEmpty(value))
+      .forEach(([name, value]) => {
+        url.searchParams.append(name, value || '');
+      });
 
     return url.href;
   }
