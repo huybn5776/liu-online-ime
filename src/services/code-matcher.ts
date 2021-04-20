@@ -3,8 +3,8 @@ import React from 'react';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { bufferCount, filter, shareReplay } from 'rxjs/operators';
 
-import { CharMappingDict } from '../interfaces/char-mapping';
-import { isComposing } from '../utils/key-event-utils';
+import { CharMappingDict } from '@interfaces/char-mapping';
+import { isComposing } from '@utils/key-event-utils';
 
 export class CodeMatcher {
   private typingCode$$ = new BehaviorSubject<string>('');

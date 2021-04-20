@@ -1,9 +1,12 @@
+const { alias, configPaths } = require('react-app-rewire-alias');
+
 /**
  * Override the webpack.config.js from create-react-app.
  * @see https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/config/webpack.config.js
  */
 module.exports = (config) => {
   config = cssModuleCamelCase(config);
+  config = alias(configPaths('./tsconfig.paths.json'))(config);
   return config;
 };
 

@@ -2,7 +2,8 @@ import React from 'react';
 
 import clsx from 'clsx';
 
-import AppLink from '../../AppLink/AppLink';
+import AppLink from '@components/AppLink/AppLink';
+
 import toolbarButtonStyle from '../ToolbarButton/ToolbarButton.module.scss';
 import styles from './ToolbarGoToSetting.module.scss';
 

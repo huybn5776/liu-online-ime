@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import * as R from 'ramda';
 
-import { CharMapping } from '../../interfaces/char-mapping';
+import { CharMapping } from '@interfaces/char-mapping';
 import {
   getUserDictFromLocalStorage,
   saveUserDictToLocalStorage,
-} from '../../services/char-mapping/user-dict-char-mapping-service';
-import { getCounter } from '../../utils/counter-utils';
+} from '@services/char-mapping/user-dict-char-mapping-service';
+import { getCounter } from '@utils/counter-utils';
+
 import styles from './UserDictSettings.module.scss';
 
 interface ColDefine<T> {

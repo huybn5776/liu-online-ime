@@ -34,6 +34,10 @@ module.exports = {
             position: 'before',
           },
           {
+            pattern: '@+(components|interfaces|services|utils)/**',
+            group: 'internal',
+          },
+          {
             pattern: '*.scss',
             group: 'index',
             patternOptions: { matchBase: true },

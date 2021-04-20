@@ -2,9 +2,10 @@ import React, { useRef, useState } from 'react';
 
 import clsx from 'clsx';
 
-import { getUserDictAsBase64String } from '../../services/char-mapping/user-dict-char-mapping-service';
-import { getAllSettingsAsBase64String } from '../../services/setting/setting-service';
-import { isNotNilOrEmpty } from '../../utils/object-utils';
+import { getUserDictAsBase64String } from '@services/char-mapping/user-dict-char-mapping-service';
+import { getAllSettingsAsBase64String } from '@services/setting/setting-service';
+import { isNotNilOrEmpty } from '@utils/object-utils';
+
 import styles from './GeneralSettings.module.scss';
 
 const GeneralSettings: React.FC = () => {

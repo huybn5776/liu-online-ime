@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 
 import clsx from 'clsx';
 
-import AppLink from '../AppLink/AppLink';
-import GeneralSettings from '../GenerialSettings/GeneralSettings';
-import GithubLink from '../GithubLink/GithubLink';
-import SettingTabContent from '../SettingTabContent/SettingTabContent';
-import UserDictSettings from '../UserDictSettings/UserDictSettings';
+import AppLink from '@components/AppLink/AppLink';
+import GeneralSettings from '@components/GenerialSettings/GeneralSettings';
+import GithubLink from '@components/GithubLink/GithubLink';
+import SettingTabContent from '@components/SettingTabContent/SettingTabContent';
+import UserDictSettings from '@components/UserDictSettings/UserDictSettings';
+
 import styles from './SettingPage.module.scss';
 
 enum SettingTab {

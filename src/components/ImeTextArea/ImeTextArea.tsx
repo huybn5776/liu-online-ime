@@ -3,11 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 import { filter, take, takeUntil } from 'rxjs/operators';
 
-import { loadCharMappings } from '../../services/char-mapping';
-import { CodeMatcher } from '../../services/code-matcher';
-import { TypingCodePreview } from '../../services/typing-code-preview';
-import CaretFollowWrapper from '../CaretPositionWrapper/CaretFollowWrapper';
-import CharChooser from '../CharChooser/CharChooser';
+import CaretFollowWrapper from '@components/CaretPositionWrapper/CaretFollowWrapper';
+import CharChooser from '@components/CharChooser/CharChooser';
+import { loadCharMappings } from '@services/char-mapping';
+import { CodeMatcher } from '@services/code-matcher';
+import { TypingCodePreview } from '@services/typing-code-preview';
+
 import styles from './ImeTextArea.module.scss';
 
 interface Props {

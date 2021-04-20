@@ -1,4 +1,5 @@
-import { isNilOrEmpty } from '../../utils/object-utils';
+import { isNilOrEmpty } from '@utils/object-utils';
+
 import { defaultSettingValue, Settings, SettingSource } from './index';
 import { localStorageSettingSource } from './local-storage-setting-source';
 import { urlSettingSource } from './url-setting-source';

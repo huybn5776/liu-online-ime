@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
-import { isNilOrEmpty } from '../../utils/object-utils';
+import { isNilOrEmpty } from '@utils/object-utils';
+
 import { Settings, SettingSource } from './index';
 
 function get<P extends keyof Settings, T = Settings[P]>(settingKey: P): T | null {

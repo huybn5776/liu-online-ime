@@ -1,7 +1,8 @@
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { CharMapping, CharMappingDict } from '../../interfaces/char-mapping';
+import { CharMapping, CharMappingDict } from '@interfaces/char-mapping';
+
 import { resolveCinCharMapping } from './cin-char-mapping-resolver';
 
 export function loadCinCharMapping(): Observable<CharMappingDict> | null {

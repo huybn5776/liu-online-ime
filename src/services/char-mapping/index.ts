@@ -1,7 +1,8 @@
 import { EMPTY, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { CharMappingDict } from '../../interfaces/char-mapping';
+import { CharMappingDict } from '@interfaces/char-mapping';
+
 import { loadCharMappingFromBoshiamy } from './boshiamy-char-mapping-service';
 import { loadCinCharMapping } from './cin-char-mapping-service';
 import { appendUserDict } from './user-dict-char-mapping-service';

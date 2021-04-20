@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 
-import { CharMappingDict } from '../../interfaces/char-mapping';
+import { CharMappingDict } from '@interfaces/char-mapping';
 
 export function loadCharMappingFromBoshiamy(): Observable<CharMappingDict> {
   return fetchCharMappingFromBoshiamy().pipe(delay(500), map(resolveTableCharMapping));

@@ -2,8 +2,9 @@ import React from 'react';
 
 import { BrowserRouter, Redirect, Route } from 'react-router-dom';
 
-import InputPage from './components/InputPage/InputPage';
-import SettingsPage from './components/SettingsPage/SettingsPage';
+import InputPage from '@components/InputPage/InputPage';
+import SettingsPage from '@components/SettingsPage/SettingsPage';
+
 import './App.scss';
 import './styles.scss';
 

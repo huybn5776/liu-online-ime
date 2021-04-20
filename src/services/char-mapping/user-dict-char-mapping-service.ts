@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
-import { CharMapping, CharMappingDict } from '../../interfaces/char-mapping';
+import { CharMapping, CharMappingDict } from '@interfaces/char-mapping';
+
 import { resolveCinCharMapping } from './cin-char-mapping-resolver';
 
 export function appendUserDict(charMappingDict: CharMappingDict): CharMappingDict {

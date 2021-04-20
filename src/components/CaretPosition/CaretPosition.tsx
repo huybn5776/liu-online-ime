@@ -12,7 +12,8 @@ import * as R from 'ramda';
 import { fromEvent, merge, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { Point } from '../../interfaces/point';
+import { Point } from '@interfaces/point';
+
 import styles from './CaretPosition.module.scss';
 
 const propertiesToCopy: (keyof CSSStyleDeclaration)[] = [

@@ -1,4 +1,4 @@
-import { CharMapping } from '../../interfaces/char-mapping';
+import { CharMapping } from '@interfaces/char-mapping';
 
 export function resolveCinCharMapping(text: string): CharMapping[] {
   return text

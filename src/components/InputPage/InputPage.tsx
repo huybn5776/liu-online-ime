@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 
-import { SettingKey } from '../../services/setting';
-import { getSetting, setSetting } from '../../services/setting/setting-service';
-import ImeTextArea, { InputMode } from '../ImeTextArea/ImeTextArea';
-import ToolbarClear from '../toolbar-buttons/ToolbarClear/ToolbarClear';
-import ToolbarCopyAll from '../toolbar-buttons/ToolbarCopyAll/ToolbarCopyAll';
-import ToolbarCopyAndClear from '../toolbar-buttons/ToolbarCopyAndClear/ToolbarCopyAndClear';
-import ToolbarExpandToggle from '../toolbar-buttons/ToolbarExpandToggle/ToolbarExpandToggle';
-import ToolbarGoToSetting from '../toolbar-buttons/ToolbarGoToSetting/ToolbarGoToSetting';
-import ToolbarSwitchInputMode from '../toolbar-buttons/ToolbarSwitchInputMode/ToolbarSwitchInputMode';
+import ImeTextArea, { InputMode } from '@components/ImeTextArea/ImeTextArea';
+import ToolbarClear from '@components/toolbar-buttons/ToolbarClear/ToolbarClear';
+import ToolbarCopyAll from '@components/toolbar-buttons/ToolbarCopyAll/ToolbarCopyAll';
+import ToolbarCopyAndClear from '@components/toolbar-buttons/ToolbarCopyAndClear/ToolbarCopyAndClear';
+import ToolbarExpandToggle from '@components/toolbar-buttons/ToolbarExpandToggle/ToolbarExpandToggle';
+import ToolbarGoToSetting from '@components/toolbar-buttons/ToolbarGoToSetting/ToolbarGoToSetting';
+import ToolbarSwitchInputMode from '@components/toolbar-buttons/ToolbarSwitchInputMode/ToolbarSwitchInputMode';
+import { SettingKey } from '@services/setting';
+import { getSetting, setSetting } from '@services/setting/setting-service';
+
 import styles from './InputPage.module.scss';
 
 const InputPage: React.FC = () => {

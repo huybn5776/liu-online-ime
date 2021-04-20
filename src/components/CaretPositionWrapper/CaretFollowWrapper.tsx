@@ -1,7 +1,8 @@
 import React, { ForwardedRef, forwardRef, ReactNode, useImperativeHandle, useRef, useState } from 'react';
 
-import { Point } from '../../interfaces/point';
-import CaretPosition from '../CaretPosition/CaretPosition';
+import CaretPosition from '@components/CaretPosition/CaretPosition';
+import { Point } from '@interfaces/point';
+
 import styles from './CaretFollowWrapper.module.scss';
 
 interface Props {
