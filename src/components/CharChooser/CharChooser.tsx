@@ -1,6 +1,6 @@
 import React, { forwardRef, memo } from 'react';
 
-import './CharChooser.scss';
+import styles from './CharChooser.module.scss';
 
 interface Props {
   matchedChars: string[];
@@ -8,18 +8,18 @@ interface Props {
 
 const CharChooser: React.ForwardRefRenderFunction<HTMLDivElement, Props> = ({ matchedChars }: Props, ref) => {
   return (
-    <div className="CharChooser" ref={ref} hidden={!matchedChars.length}>
-      <ul className="matched-char-list">
+    <div className={styles.CharChooser} ref={ref} hidden={!matchedChars.length}>
+      <ul className={styles.matchedCharList}>
         {matchedChars.map((matchedChar) => (
-          <li className="matched-char-item" key={matchedChar}>
+          <li className={styles.matchedCharItem} key={matchedChar}>
             {matchedChar}
           </li>
         ))}
       </ul>
 
-      <div className="state-line">
-        <span className="number-key-label">數字鍵</span>
-        <span className="pagination-label">(1/1)</span>
+      <div className={styles.stateLine}>
+        <span className={styles.numberKeyLabel}>數字鍵</span>
+        <span className={styles.paginationLabel}>(1/1)</span>
       </div>
     </div>
   );

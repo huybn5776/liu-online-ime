@@ -7,16 +7,6 @@
   margin: 0 auto;
 }
 
-.ime-input-container {
-  position: relative;
-  height: 100%;
-
-  & .ime-textarea {
-    width: 100%;
-    height: 100%;
-  }
-}
-
 .bottom-toolbar {
   display: flex;
   gap: 4px;
@@ -26,8 +16,4 @@
   background-color: #f8f8f8;
   border: 1px solid #d1d1d1;
   border-top: 0;
-}
-
-.setting-button {
-  margin-left: auto;
 }

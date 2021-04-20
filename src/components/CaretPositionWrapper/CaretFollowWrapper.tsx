@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef, ReactNode, useImperativeHandle, useRef
 
 import { Point } from '../../interfaces/point';
 import CaretPosition from '../CaretPosition/CaretPosition';
-import './CaretFollowWrapper.scss';
+import styles from './CaretFollowWrapper.module.scss';
 
 interface Props {
   textArea: HTMLTextAreaElement | null;
@@ -31,10 +31,15 @@ const CaretFollowWrapper: React.ForwardRefRenderFunction<ForwardedProps, Props> 
 
   return (
     <>
-      <CaretPosition ref={caretPositionComponent} textArea={textArea} passive={passive} onPositionChange={setCaretPosition} />
+      <CaretPosition
+        ref={caretPositionComponent}
+        textArea={textArea}
+        passive={passive}
+        onPositionChange={setCaretPosition}
+      />
       <div
-        className="caret-follow-container"
-        style={{ left: `${caretPosition.x}px`, top: `${caretPosition.y}px`}}
+        className={styles.caretFollowContainer}
+        style={{ left: `${caretPosition.x}px`, top: `${caretPosition.y}px` }}
       >
         {children}
       </div>

@@ -9,7 +9,7 @@ import ToolbarCopyAndClear from '../toolbar-buttons/ToolbarCopyAndClear/ToolbarC
 import ToolbarExpandToggle from '../toolbar-buttons/ToolbarExpandToggle/ToolbarExpandToggle';
 import ToolbarGoToSetting from '../toolbar-buttons/ToolbarGoToSetting/ToolbarGoToSetting';
 import ToolbarSwitchInputMode from '../toolbar-buttons/ToolbarSwitchInputMode/ToolbarSwitchInputMode';
-import './InputPage.scss';
+import styles from './InputPage.module.scss';
 
 const InputPage: React.FC = () => {
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.chinese);
@@ -21,12 +21,10 @@ const InputPage: React.FC = () => {
   const [toolbarExpanded, setToolbarExpanded] = useState<boolean>(getSetting(SettingKey.toolbarExpanded));
 
   return (
-    <div className="InputPage">
-      <div className="ime-input-container">
-        <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode}/>
-      </div>
+    <div className={styles.InputPage}>
+      <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode}/>
 
-      <div className={`bottom-toolbar${toolbarExpanded ? ' expand' : ''}`}>
+      <div className={styles.bottomToolbar}>
         <ToolbarSwitchInputMode
           expand={toolbarExpanded}
           modeLabel={inputModeLabel[inputMode]}
@@ -36,7 +34,7 @@ const InputPage: React.FC = () => {
         <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
         <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
         <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick}/>
-        <ToolbarGoToSetting className="setting-button" expand={toolbarExpanded}/>
+        <ToolbarGoToSetting expand={toolbarExpanded}/>
       </div>
     </div>
   );

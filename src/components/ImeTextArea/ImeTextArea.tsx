@@ -8,7 +8,7 @@ import { CodeMatcher } from '../../services/code-matcher';
 import { TypingCodePreview } from '../../services/typing-code-preview';
 import CaretFollowWrapper from '../CaretPositionWrapper/CaretFollowWrapper';
 import CharChooser from '../CharChooser/CharChooser';
-import './ImeTextArea.scss';
+import styles from './ImeTextArea.module.scss';
 
 interface Props {
   value?: string;
@@ -85,10 +85,10 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
   useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
 
   return (
-    <div className="ImeTextArea">
-      <textarea className="ime-textarea" ref={setTextArea} onKeyDown={onKeyDown} />
+    <div className={styles.ImeTextArea}>
+      <textarea className={styles.textarea} ref={setTextArea} onKeyDown={onKeyDown} />
       <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea}>
-        <p className="typing-code">{typingCode}</p>
+        <p className={styles.typingCode}>{typingCode}</p>
         <CharChooser matchedChars={matchedChars} />
       </CaretFollowWrapper>
     </div>

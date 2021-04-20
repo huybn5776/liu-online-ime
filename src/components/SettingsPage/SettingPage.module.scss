@@ -7,10 +7,21 @@
 }
 
 .icon-button.setting-page-close-button {
+  display: flex;
   align-self: center;
   width: 32px;
   height: 32px;
   margin-left: auto;
+  color: grey;
+  background-color: transparent;
+  border: 0;
+  border-radius: 4px;
+  transition: background-color .2s, color .2s, transform .2s;
+
+  > .close-icon {
+    margin: auto;
+    line-height: 1em;
+  }
 }
 
 .github-link-container {

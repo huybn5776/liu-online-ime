@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as R from 'ramda';
 
 import { CharMapping } from '../../interfaces/char-mapping';
-import './UserDictSettings.scss';
 import {
   getUserDictFromLocalStorage,
   saveUserDictToLocalStorage,
 } from '../../services/char-mapping/user-dict-char-mapping-service';
 import { getCounter } from '../../utils/counter-utils';
+import styles from './UserDictSettings.module.scss';
 
 interface ColDefine<T> {
   field: keyof T;
@@ -35,10 +35,10 @@ const UserDictSettings: React.FC = () => {
   }, [userDict]);
 
   return (
-    <div className="UserDictSettings">
-      <p className="user-dict-grid-header" />
-      <p className="user-dict-grid-header">拆碼 (最多5碼)</p>
-      <p className="user-dict-grid-header">對應字詞</p>
+    <div className={styles.UserDictSettings}>
+      <p className={styles.userDictGridHeader} />
+      <p className={styles.userDictGridHeader}>拆碼 (最多5碼)</p>
+      <p className={styles.userDictGridHeader}>對應字詞</p>
       {renderRows(userDict, [{ field: 'code', maxLength: 5 }, { field: 'char' }])}
     </div>
   );
@@ -52,7 +52,7 @@ const UserDictSettings: React.FC = () => {
 
           return (
             <input
-              className="user-dict-input"
+              className={styles.userDictInput}
               type="text"
               key={charMapping.id + colDefine.field}
               value={charMapping[colDefine.field]}
@@ -76,9 +76,9 @@ const UserDictSettings: React.FC = () => {
 
   function renderDeleteButton(charMapping: CharMapping): JSX.Element {
     return (
-      <div className="user-dict-delete-button-container">
+      <div className={styles.userDictDeleteButtonContainer}>
         {charMapping.char || charMapping.code ? (
-          <button className="user-dict-delete-button" type="button" onClick={() => deleteCharMapping(charMapping)}>
+          <button className={styles.userDictDeleteButton} type="button" onClick={() => deleteCharMapping(charMapping)}>
             <i className="trash alternate outline icon" />
           </button>
         ) : null}

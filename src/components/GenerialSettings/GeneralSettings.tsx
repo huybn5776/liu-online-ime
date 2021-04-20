@@ -1,9 +1,11 @@
 import React, { useRef, useState } from 'react';
 
+import clsx from 'clsx';
+
 import { getUserDictAsBase64String } from '../../services/char-mapping/user-dict-char-mapping-service';
 import { getAllSettingsAsBase64String } from '../../services/setting/setting-service';
-import './GeneralSettings.scss';
 import { isNotNilOrEmpty } from '../../utils/object-utils';
+import styles from './GeneralSettings.module.scss';
 
 const GeneralSettings: React.FC = () => {
   const [settingUrl, setSettingUrl] = useState('');
@@ -16,7 +18,7 @@ const GeneralSettings: React.FC = () => {
       </button>
       <br />
       {settingUrl ? (
-        <label className="setting-url-label" htmlFor="exported-setting-url">
+        <label className={styles.settingUrlLabel} htmlFor="exported-setting-url">
           將此 url 於其它裝置上開啟，即可套用目前的設定以及加字加詞。你可以把它存在
           <a href="https://reurl.cc/main/tw" target="_blank" rel="noreferrer noopener">
             短網址
@@ -25,7 +27,7 @@ const GeneralSettings: React.FC = () => {
           <br />
           <input
             id="exported-setting-url"
-            className="ui input setting-url-input"
+            className={clsx('ui', 'input', styles.settingUrlInput)}
             ref={(input) => {
               settingUrlInput.current = input;
               input?.select();

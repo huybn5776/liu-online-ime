@@ -21,7 +21,7 @@ module.exports = {
     project: './tsconfig.json',
   },
   plugins: ['react', '@typescript-eslint', 'jest'],
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'config-overrides.js'],
   rules: {
     'import/order': [
       2,
@@ -32,6 +32,11 @@ module.exports = {
             pattern: 'react',
             group: 'external',
             position: 'before',
+          },
+          {
+            pattern: '*.scss',
+            group: 'index',
+            patternOptions: { matchBase: true },
           },
         ],
         pathGroupsExcludedImportTypes: ['react'],
@@ -56,6 +61,7 @@ module.exports = {
     'no-useless-return': 1,
     'prettier/prettier': 0,
     'react/jsx-props-no-spreading': 0,
+    semi: [2, 'always'],
 
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/no-static-element-interactions': 0,

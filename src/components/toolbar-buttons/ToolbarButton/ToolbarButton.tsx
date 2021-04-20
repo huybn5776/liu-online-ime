@@ -1,6 +1,8 @@
 import React, { memo, ReactNode } from 'react';
 
-import './ToolbarButton.scss';
+import clsx from 'clsx';
+
+import styles from './ToolbarButton.module.scss';
 
 type Props = {
   title: string;
@@ -11,7 +13,7 @@ type Props = {
 
 const ToolbarButton: React.FC<Props> = ({ title, hotkeyLabel, expand, className, children, ...rest }: Props) => (
   <button
-    className={`toolbar-button${expand ? ' expand' : ''}${className ? ` ${className}` : ''}`}
+    className={clsx(styles.toolbarButton, { [styles.expand]: expand }, className)}
     type="button"
     title={title}
     data-hotkey={hotkeyLabel}

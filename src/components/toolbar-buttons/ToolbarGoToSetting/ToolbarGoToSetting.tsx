@@ -1,6 +1,10 @@
 import React from 'react';
 
+import clsx from 'clsx';
+
 import AppLink from '../../AppLink/AppLink';
+import toolbarButtonStyle from '../ToolbarButton/ToolbarButton.module.scss';
+import styles from './ToolbarGoToSetting.module.scss';
 
 type Props = {
   expand: boolean;
@@ -8,13 +12,18 @@ type Props = {
 
 const ToolbarGoToSetting: React.FC<Props> = ({ expand, className, ...rest }: Props) => (
   <AppLink
-    className={`toolbar-button setting-button${expand ? ' expand' : ''}${className ? ` ${className}` : ''}`}
+    className={clsx(
+      toolbarButtonStyle.toolbarButton,
+      styles.settingButton,
+      { [toolbarButtonStyle.expand]: expand },
+      className,
+    )}
     to="/settings"
     withParas
     title="設定"
     {...rest}
   >
-    <i className="icon cog" />
+    <i className={clsx('icon', 'cog', toolbarButtonStyle.toolbarButtonIcon)} />
   </AppLink>
 );
 

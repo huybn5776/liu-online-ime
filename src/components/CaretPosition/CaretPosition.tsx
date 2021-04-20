@@ -13,7 +13,7 @@ import { fromEvent, merge, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import { Point } from '../../interfaces/point';
-import './CaretPosition.scss';
+import styles from './CaretPosition.module.scss';
 
 const propertiesToCopy: (keyof CSSStyleDeclaration)[] = [
   'boxSizing',
@@ -94,13 +94,13 @@ const CaretPosition: React.ForwardRefRenderFunction<ForwardedProps, Props> = (
   }, [textArea, passive, onPositionChange]);
 
   useEffect(() => {
-    const computedStyle = textArea && getComputedStyle(textArea) || {};
+    const computedStyle = (textArea && getComputedStyle(textArea)) || {};
     const style = R.pick(propertiesToCopy, computedStyle) as CSSProperties;
     setMirrorStyle(style);
   }, [textArea]);
 
   return (
-    <div className="CaretPosition" ref={mirrorDiv} style={mirrorStyle}>
+    <div className={styles.CaretPosition} ref={mirrorDiv} style={mirrorStyle}>
       <span ref={trackerSpan}>.</span>
     </div>
   );
