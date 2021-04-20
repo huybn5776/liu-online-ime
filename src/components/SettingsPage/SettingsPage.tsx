@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import clsx from 'clsx';
 
 import AppLink from '../AppLink/AppLink';
-import CornerGithubLink from '../CornerGithubLink/CornerGithubLink';
 import GeneralSettings from '../GenerialSettings/GeneralSettings';
+import GithubLink from '../GithubLink/GithubLink';
 import SettingTabContent from '../SettingTabContent/SettingTabContent';
 import UserDictSettings from '../UserDictSettings/UserDictSettings';
 import styles from './SettingPage.module.scss';
@@ -22,6 +22,7 @@ const SettingsPage: React.FC = () => {
       <div className="ui top attached tabular menu">
         {renderTabButton(SettingTab.general, '一般設定')}
         {renderTabButton(SettingTab.userDict, '加字加詞')}
+        <GithubLink />
         <AppLink className={clsx(styles.iconButton, styles.settingPageCloseButton)} to="/" withParas>
           <i className={clsx('close', 'icon', styles.closeIcon)} />
         </AppLink>
@@ -32,9 +33,6 @@ const SettingsPage: React.FC = () => {
       <SettingTabContent active={activeTab === SettingTab.userDict}>
         <UserDictSettings />
       </SettingTabContent>
-      <div className={styles.githubLinkContainer}>
-        <CornerGithubLink />
-      </div>
     </div>
   );
 

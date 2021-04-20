@@ -2,11 +2,15 @@ import React from 'react';
 
 import clsx from 'clsx';
 
-import styles from './CornerGithubLink.module.scss';
+import styles from './GithubLink.module.scss';
 
-const CornerGithubLink: React.FC = () => (
+interface Props {
+  className?: string;
+}
+
+const GithubLink: React.FC<Props> = ({ className }: Props) => (
   <a
-    className={styles.cornerGithubLink}
+    className={clsx('item', styles.githubLink, className)}
     href="https://github.com/huybn5776/liu-online-ime"
     target="_blank"
     rel="noreferrer noopener"
@@ -15,4 +19,4 @@ const CornerGithubLink: React.FC = () => (
   </a>
 );
 
-export default CornerGithubLink;
+export default GithubLink;
