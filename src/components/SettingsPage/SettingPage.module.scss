@@ -2,8 +2,16 @@
   position: relative;
 }
 
-.setting-tab-button:focus {
-  outline: 0;
+.setting-tab-button {
+  cursor: pointer;
+
+  &:focus {
+    outline: 0;
+  }
+
+  & + & {
+    margin-left: 4px;
+  }
 }
 
 .icon-button.setting-page-close-button {

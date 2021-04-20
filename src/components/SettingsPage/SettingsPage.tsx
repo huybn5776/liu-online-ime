@@ -22,7 +22,7 @@ const SettingsPage: React.FC = () => {
       <div className="ui top attached tabular menu">
         {renderTabButton(SettingTab.general, '一般設定')}
         {renderTabButton(SettingTab.userDict, '加字加詞')}
-        <GithubLink />
+        <GithubLink className={styles.settingTabButton} />
         <AppLink className={clsx(styles.iconButton, styles.settingPageCloseButton)} to="/" withParas>
           <i className={clsx('close', 'icon', styles.closeIcon)} />
         </AppLink>
