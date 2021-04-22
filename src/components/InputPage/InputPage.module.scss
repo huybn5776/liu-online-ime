@@ -17,3 +17,9 @@
   border: 1px solid #d1d1d1;
   border-top: 0;
 }
+
+@media (max-width: 350px), (max-height: 200px) {
+  .bottom-toolbar {
+    display: none;
+  }
+}

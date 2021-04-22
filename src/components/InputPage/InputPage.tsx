@@ -6,6 +6,7 @@ import ToolbarCopyAll from '@components/toolbar-buttons/ToolbarCopyAll/ToolbarCo
 import ToolbarCopyAndClear from '@components/toolbar-buttons/ToolbarCopyAndClear/ToolbarCopyAndClear';
 import ToolbarExpandToggle from '@components/toolbar-buttons/ToolbarExpandToggle/ToolbarExpandToggle';
 import ToolbarGoToSetting from '@components/toolbar-buttons/ToolbarGoToSetting/ToolbarGoToSetting';
+import ToolbarOpenWindow from '@components/toolbar-buttons/ToolbarOpenWindow/ToolbarOpenWindow';
 import ToolbarSwitchInputMode from '@components/toolbar-buttons/ToolbarSwitchInputMode/ToolbarSwitchInputMode';
 import { SettingKey } from '@services/setting';
 import { getSetting, setSetting } from '@services/setting/setting-service';
@@ -34,6 +35,7 @@ const InputPage: React.FC = () => {
         <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll}/>
         <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
         <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
+        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow} />
         <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick}/>
         <ToolbarGoToSetting expand={toolbarExpanded}/>
       </div>
@@ -54,6 +56,15 @@ const InputPage: React.FC = () => {
 
   function clear(): void {
     setValue('');
+  }
+
+  function openNewWindow(): void {
+    const width = 230;
+    const height = 100;
+    const padding = 50;
+    const left = window.outerWidth - width - padding;
+    const top = window.outerHeight - height - padding;
+    window.open(window.location.href, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
   }
 
   function copyAndClear(): void {
