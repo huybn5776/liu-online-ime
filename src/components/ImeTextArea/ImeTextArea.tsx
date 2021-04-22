@@ -106,6 +106,10 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
     if (inputMode === InputMode.english) {
       return;
     }
+    if (!codeMatcher$$.current?.value) {
+      handleCharMappingNotReady(event);
+      return;
+    }
 
     codeMatcher$$.current?.value?.onKeyDown?.(event);
     if (event.isDefaultPrevented()) {
@@ -135,6 +139,15 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
         inputModeChange?.(nextInputMode);
         codeMatcher$$.current?.value?.clear();
       });
+  }
+
+  function handleCharMappingNotReady(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    const codeChars = "abcdefghijklmnopqrstuvwxyz,.'[]";
+    if (!codeChars.includes(event.key)) {
+      return;
+    }
+    setCharSelections(['字碼表載入中...']);
+    caretFollowWrapper.current?.updatePosition();
   }
 
   function handleCopy(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
