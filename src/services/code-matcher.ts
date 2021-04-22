@@ -34,7 +34,7 @@ export class CodeMatcher {
     }
 
     const inputKey = event.key;
-    if (inputKey.match(/^[a-z]$/)) {
+    if (inputKey.match(/^[a-z,.'[\]]$/)) {
       this.onTypingCode(event);
     } else if (inputKey === 'Backspace') {
       this.handleBackspace(event);
