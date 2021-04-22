@@ -25,7 +25,9 @@ export enum InputMode {
 
 const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsInputMode, inputModeChange }: Props) => {
   const [typingCode, setTypingCode] = useState('');
-  const [matchedChars, setMatchedChars] = useState<string[]>([]);
+  const [charSelections, setCharSelections] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
   const [textArea, setTextArea] = useState<HTMLTextAreaElement | null>(null);
 
@@ -61,7 +63,9 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
       const typingCodePreview = new TypingCodePreview(textArea, codeMatcher);
 
       codeMatcher.typingCode$.pipe(takeUntil(textAreaUpdated$$)).subscribe((code) => setTypingCode(code));
-      codeMatcher.matchedChars$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setMatchedChars);
+      codeMatcher.charSelections$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setCharSelections);
+      codeMatcher.page$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setPage);
+      codeMatcher.totalPage$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setTotalPages);
       codeMatcher.startTypingCode$.subscribe(() => {
         typingCodePreview.deleteSelectedText();
         caretFollowWrapper.current?.updatePosition();
@@ -71,7 +75,7 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
         textAreaUpdated$$.subscribe(() => {
           codeMatcher.clear();
           setTypingCode('');
-          setMatchedChars([]);
+          setCharSelections([]);
           typingCodePreview.dispose();
         });
       });
@@ -90,7 +94,7 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
       <textarea className={styles.textarea} ref={setTextArea} onKeyDown={onKeyDown} />
       <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea}>
         <p className={styles.typingCode}>{typingCode}</p>
-        <CharChooser matchedChars={matchedChars} />
+        <CharChooser charSelections={charSelections} page={page} totalPages={totalPages} />
       </CaretFollowWrapper>
     </div>
   );

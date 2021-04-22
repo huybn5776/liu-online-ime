@@ -3,23 +3,28 @@ import React, { forwardRef, memo } from 'react';
 import styles from './CharChooser.module.scss';
 
 interface Props {
-  matchedChars: string[];
+  charSelections: string[];
+  page: number;
+  totalPages: number;
 }
 
-const CharChooser: React.ForwardRefRenderFunction<HTMLDivElement, Props> = ({ matchedChars }: Props, ref) => {
+const CharChooser: React.ForwardRefRenderFunction<HTMLDivElement, Props> = (
+  { charSelections, page, totalPages }: Props,
+  ref,
+) => {
   return (
-    <div className={styles.CharChooser} ref={ref} hidden={!matchedChars.length}>
+    <div className={styles.CharChooser} ref={ref} hidden={!charSelections.length}>
       <ul className={styles.matchedCharList}>
-        {matchedChars.map((matchedChar) => (
-          <li className={styles.matchedCharItem} key={matchedChar}>
-            {matchedChar}
+        {charSelections.map((char) => (
+          <li className={styles.matchedCharItem} key={char}>
+            {char}
           </li>
         ))}
       </ul>
 
       <div className={styles.stateLine}>
         <span className={styles.numberKeyLabel}>數字鍵</span>
-        <span className={styles.paginationLabel}>(1/1)</span>
+        <span className={styles.paginationLabel}>{`(${page + 1}/${totalPages})`}</span>
       </div>
     </div>
   );

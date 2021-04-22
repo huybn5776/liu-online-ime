@@ -1,5 +1,5 @@
 .CharChooser {
-  width: 300px;
+  min-width: 300px;
   padding: 0 6px 0 12px;
   background: white;
   border: 1px solid #bbb;
@@ -9,7 +9,7 @@
 
 .matched-char-list {
   margin: 6px 0;
-  padding: 0;
+  padding: 0 12px 0 0;
   list-style: none;
   counter-reset: char-index -1;
 }
