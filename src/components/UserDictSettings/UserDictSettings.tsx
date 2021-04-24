@@ -3,10 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as R from 'ramda';
 
 import { CharMapping } from '@interfaces/char-mapping';
-import {
-  getUserDictFromLocalStorage,
-  saveUserDictToLocalStorage,
-} from '@services/char-mapping/user-dict-char-mapping-service';
+import { getUserDict, saveUserDictToLocalStorage } from '@services/char-mapping/user-dict-char-mapping-service';
 import { getCounter } from '@utils/counter-utils';
 
 import styles from './UserDictSettings.module.scss';
@@ -21,7 +18,7 @@ const UserDictSettings: React.FC = () => {
 
   const [userDict, setUserDict] = useState<CharMapping[]>(() => {
     return R.pipe(
-      getUserDictFromLocalStorage,
+      getUserDict,
       R.defaultTo([]),
       R.append({ code: '', char: '' } as CharMapping),
       R.map(({ char, code }) => ({ id: nextId(), char, code })),

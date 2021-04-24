@@ -5,7 +5,7 @@ import { CharMapping, CharMappingDict } from '@interfaces/char-mapping';
 import { resolveCinCharMapping } from './cin-char-mapping-resolver';
 
 export function appendUserDict(charMappingDict: CharMappingDict): CharMappingDict {
-  const userDictMappings = getUserDictFromUrl() || getUserDictFromLocalStorage();
+  const userDictMappings = getUserDict();
 
   const newCharMappingDict = {} as CharMappingDict;
   userDictMappings?.forEach((charMapping) => {
@@ -16,6 +16,10 @@ export function appendUserDict(charMappingDict: CharMappingDict): CharMappingDic
   });
 
   return { ...charMappingDict, ...newCharMappingDict };
+}
+
+export function getUserDict(): CharMapping[] | null {
+  return getUserDictFromUrl() || getUserDictFromLocalStorage();
 }
 
 function getUserDictFromUrl(): CharMapping[] | null {
