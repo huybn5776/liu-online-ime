@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { fromEvent } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -16,14 +16,16 @@ import { getSetting, setSetting } from '@services/setting/setting-service';
 
 import styles from './InputPage.module.scss';
 
+const inputModeLabel = Object.freeze({
+  [InputMode.chinese]: '嘸',
+  [InputMode.english]: 'Ａ',
+});
+
 const InputPage: React.FC = () => {
+  const quickCopyMode = useMemo<boolean>(() => getSetting(SettingKey.quickCopyMode), []);
+
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.chinese);
-  const [inputModeLabel] = useState<Record<InputMode, string>>({
-    [InputMode.chinese]: '嘸',
-    [InputMode.english]: 'Ａ',
-  });
   const [value, setValue] = useState('');
-  const [quickCopyMode] = useState<boolean>(getSetting(SettingKey.quickCopyMode));
   const [toolbarExpanded, setToolbarExpanded] = useState<boolean>(getSetting(SettingKey.toolbarExpanded));
 
   useEffect(() => {
@@ -56,7 +58,7 @@ const InputPage: React.FC = () => {
         <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll}/>
         <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
         <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
-        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow} />
+        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow}/>
         <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick}/>
         <ToolbarGoToSetting expand={toolbarExpanded}/>
       </div>

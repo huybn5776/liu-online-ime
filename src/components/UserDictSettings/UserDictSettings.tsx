@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import * as R from 'ramda';
 
@@ -17,7 +17,7 @@ interface ColDefine<T> {
 }
 
 const UserDictSettings: React.FC = () => {
-  const [nextId] = useState(() => getCounter(0).next);
+  const nextId = useMemo(() => getCounter(0).next, []);
 
   const [userDict, setUserDict] = useState<CharMapping[]>(() => {
     return R.pipe(
