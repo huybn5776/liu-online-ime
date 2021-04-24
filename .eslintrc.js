@@ -68,6 +68,13 @@ module.exports = {
     semi: [2, 'always'],
 
     'jsx-a11y/click-events-have-key-events': 0,
+    'jsx-a11y/label-has-associated-control': [2, {
+      'some': ['nesting', 'id'],
+      labelComponents: [],
+      labelAttributes: [],
+      controlComponents: [],
+      depth: 25,
+    }],
     'jsx-a11y/no-static-element-interactions': 0,
 
     'react/no-unused-prop-types': 1,
