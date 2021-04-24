@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { fromEvent } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import ImeTextArea, { InputMode } from '@components/ImeTextArea/ImeTextArea';
 import ToolbarClear from '@components/toolbar-buttons/ToolbarClear/ToolbarClear';
@@ -20,7 +23,25 @@ const InputPage: React.FC = () => {
     [InputMode.english]: 'Ａ',
   });
   const [value, setValue] = useState('');
+  const [quickCopyMode] = useState<boolean>(getSetting(SettingKey.quickCopyMode));
   const [toolbarExpanded, setToolbarExpanded] = useState<boolean>(getSetting(SettingKey.toolbarExpanded));
+
+  useEffect(() => {
+    if (quickCopyMode) {
+      const subscription = fromEvent<KeyboardEvent>(document, 'keydown')
+        .pipe(filter((event) => event.key === 'Enter' && !event.shiftKey))
+        .subscribe((event) => {
+          setValue((currentValue) => {
+            navigator.clipboard.writeText(currentValue);
+            return '';
+          });
+          event.preventDefault();
+        });
+      return () => subscription.unsubscribe();
+    }
+
+    return () => {};
+  }, [quickCopyMode]);
 
   return (
     <div className={styles.InputPage}>

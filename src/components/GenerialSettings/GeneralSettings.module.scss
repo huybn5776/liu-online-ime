@@ -1,9 +1,27 @@
+.GeneralSetting {
+  display: grid;
+  grid-row-gap: 8px;
+}
+
+.export-setting-button {
+  width: fit-content;
+}
+
 .setting-url-label {
   display: block;
-  margin-top: 4px;
 }
 
 .setting-url-input {
   margin-right: 4px;
   padding: 4px 6px;
+}
+
+.setting-label {
+  color: black;
+  font-size: 16px;
+}
+
+.setting-description {
+  color: #3e3e3e;
+  font-size: 14px;
 }

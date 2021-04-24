@@ -1,9 +1,11 @@
 export enum SettingKey {
   toolbarExpanded = 'toolbarExpanded',
+  quickCopyMode = 'quickCopyMode',
 }
 
 export const defaultSettingValue = {
   toolbarExpanded: true,
+  quickCopyMode: false,
 };
 
 export type Settings = typeof defaultSettingValue;
