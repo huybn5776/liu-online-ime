@@ -47,7 +47,6 @@ export class TypingCodePreview {
       .pipe(
         takeUntil(merge(this.dispose$$, this.codeMatcher.stopTypingCode$)),
         take(1),
-        map((code) => code.toUpperCase()),
       )
       .subscribe((texToInsert) => {
         this.insertTextToTextArea(texToInsert);
