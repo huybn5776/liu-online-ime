@@ -104,6 +104,7 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
       handleShiftKey();
     }
     if (inputMode === InputMode.english) {
+      onValueChange?.((event.target as HTMLTextAreaElement).value);
       return;
     }
     if (!codeMatcher$$.current?.value) {
