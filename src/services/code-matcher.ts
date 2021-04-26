@@ -1,10 +1,22 @@
-import React from 'react';
-
 import { BehaviorSubject, Subject } from 'rxjs';
-import { bufferCount, distinctUntilChanged, filter, shareReplay } from 'rxjs/operators';
+import { bufferCount, filter, shareReplay } from 'rxjs/operators';
 
 import { CharMappingDict } from '@interfaces/char-mapping';
 import { isComposing } from '@utils/key-event-utils';
+
+export interface MatchResult {
+  typingCode: string;
+  charSelections: string[];
+  page: number;
+  totalPages: number;
+}
+
+export const emptyMatchResult = Object.freeze({
+  typingCode: '',
+  charSelections: [],
+  page: 0,
+  totalPages: 0,
+});
 
 export class CodeMatcher {
   private readonly pageSize = 10;
@@ -12,18 +24,13 @@ export class CodeMatcher {
   private readonly pageDownKeys = Object.freeze(['PageDown', 'ArrowDown']);
 
   private typingCode$$ = new BehaviorSubject<string>('');
+  private matchResult$$ = new BehaviorSubject<MatchResult>(emptyMatchResult);
   private matchedChars$$ = new BehaviorSubject<string[]>([]);
-  private charSelections$$ = new BehaviorSubject<string[]>([]);
-  private page$$ = new BehaviorSubject<number>(0);
-  private totalPage$$ = new BehaviorSubject<number>(0);
   private char$$ = new Subject<string>();
   private cancel$$ = new Subject<void>();
 
   typingCode$ = this.typingCode$$.asObservable();
-  matchedChars$ = this.matchedChars$$.asObservable();
-  charSelections$ = this.charSelections$$.asObservable();
-  page$ = this.page$$.pipe(distinctUntilChanged());
-  totalPage$ = this.totalPage$$.pipe(distinctUntilChanged());
+  matchResult$ = this.matchResult$$.asObservable();
   char$ = this.char$$.asObservable();
   cancel$ = this.cancel$$.asObservable();
   startTypingCode$ = this.typingCode$$.pipe(
@@ -36,9 +43,12 @@ export class CodeMatcher {
     filter(([lastCode, currentCode]) => !!lastCode && !currentCode),
   );
 
+  page = emptyMatchResult.page;
+  totalPages = emptyMatchResult.totalPages;
+
   constructor(private readonly charMappingDict: CharMappingDict) {}
 
-  onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  onKeyDown(event: KeyboardEvent): void {
     if (event.metaKey || event.shiftKey || isComposing(event)) {
       return;
     }
@@ -62,12 +72,10 @@ export class CodeMatcher {
   clear(): void {
     this.typingCode$$.next('');
     this.matchedChars$$.next([]);
-    this.charSelections$$.next([]);
-    this.page$$.next(0);
-    this.totalPage$$.next(0);
+    this.matchResult$$.next(emptyMatchResult);
   }
 
-  private onTypingCode(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  private onTypingCode(event: KeyboardEvent): void {
     if (this.typingCode$$.value.length < 5) {
       this.typingCode$$.next(this.typingCode$$.value + event.key);
       this.updateMatchedChars();
@@ -79,21 +87,23 @@ export class CodeMatcher {
     const typingCode = this.typingCode$$.value;
     const matchedChars = this.charMappingDict[typingCode] || [];
     this.matchedChars$$.next(matchedChars);
-    this.page$$.next(0);
-    this.updateCharSelections();
+    this.page = 0;
+    this.updateMatchResult();
   }
 
-  private updateCharSelections(): void {
+  private updateMatchResult(): void {
     const matchedChars = this.matchedChars$$.value;
-    const charSelections = matchedChars.slice(
-      this.page$$.value * this.pageSize,
-      (this.page$$.value + 1) * this.pageSize,
-    );
-    this.charSelections$$.next(charSelections);
-    this.totalPage$$.next(Math.ceil(matchedChars.length / this.pageSize));
+    const charSelections = matchedChars.slice(this.page * this.pageSize, (this.page + 1) * this.pageSize);
+    this.matchResult$$.next({
+      typingCode: this.typingCode$$.value,
+      charSelections,
+      page: this.page,
+      totalPages: this.totalPages,
+    });
+    this.totalPages = Math.ceil(matchedChars.length / this.pageSize);
   }
 
-  private handleBackspace(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  private handleBackspace(event: KeyboardEvent): void {
     const typingCode = this.typingCode$$.value;
     if (!typingCode.length) {
       return;
@@ -104,25 +114,25 @@ export class CodeMatcher {
     event.preventDefault();
   }
 
-  private handleCancelInput(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  private handleCancelInput(event: KeyboardEvent): void {
     this.cancel$$.next();
     this.clear();
     event.preventDefault();
   }
 
-  private handlePage(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  private handlePage(event: KeyboardEvent): void {
     if (this.pageDownKeys.includes(event.key)) {
-      this.page$$.next(Math.min(this.totalPage$$.value - 1, this.page$$.value + 1));
-      this.updateCharSelections();
+      this.page = Math.min(this.totalPages - 1, this.page + 1);
+      this.updateMatchResult();
       event.preventDefault();
     } else if (this.pageUpKeys.includes(event.key)) {
-      this.page$$.next(Math.max(0, this.page$$.value - 1));
-      this.updateCharSelections();
+      this.page = Math.max(0, this.page - 1);
+      this.updateMatchResult();
       event.preventDefault();
     }
   }
 
-  private recognizeInput(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  private recognizeInput(event: KeyboardEvent): void {
     const firstMatch = this.matchedChars$$.value[0];
     if (firstMatch) {
       this.char$$.next(firstMatch);
@@ -135,8 +145,8 @@ export class CodeMatcher {
     }
   }
 
-  private sendMatchedChar(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    const index = parseInt(event.key, 10) + this.page$$.value * this.pageSize;
+  private sendMatchedChar(event: KeyboardEvent): void {
+    const index = parseInt(event.key, 10) + this.page * this.pageSize;
     const char = this.matchedChars$$.value[index];
     if (char) {
       this.char$$.next(char);

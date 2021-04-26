@@ -3,7 +3,7 @@ import { map, take, takeUntil } from 'rxjs/operators';
 
 import { CodeMatcher } from './code-matcher';
 
-export class TypingCodePreview {
+export class TextUpdateHelper {
   private value = '';
   private selectionStart = 0;
   private dispose$$ = new Subject<void>();
@@ -39,15 +39,10 @@ export class TypingCodePreview {
         takeUntil(this.codeMatcher.stopTypingCode$),
         map((code) => code.toUpperCase()),
       )
-      .subscribe((texToInsert) => {
-        this.insertTextToTextArea(texToInsert);
-      });
+      .subscribe((texToInsert) => this.insertTextToTextArea(texToInsert));
     this.codeMatcher.char$
       .pipe(take(1))
-      .pipe(
-        takeUntil(merge(this.dispose$$, this.codeMatcher.stopTypingCode$)),
-        take(1),
-      )
+      .pipe(takeUntil(merge(this.dispose$$, this.codeMatcher.stopTypingCode$)), take(1))
       .subscribe((texToInsert) => {
         this.insertTextToTextArea(texToInsert);
         this.value$$.next(this.textArea.value);

@@ -14,6 +14,7 @@ interface ColDefine<T> {
 }
 
 const UserDictSettings: React.FC = () => {
+  const colDefines = useMemo<ColDefine<CharMapping>[]>(() => [{ field: 'code', maxLength: 5 }, { field: 'char' }], []);
   const nextId = useMemo(() => getCounter(0).next, []);
 
   const [userDict, setUserDict] = useState<CharMapping[]>(() => {
@@ -32,17 +33,8 @@ const UserDictSettings: React.FC = () => {
     saveUserDictToLocalStorage(userDict);
   }, [userDict]);
 
-  return (
-    <div className={styles.UserDictSettings}>
-      <p className={styles.userDictGridHeader} />
-      <p className={styles.userDictGridHeader}>拆碼 (最多5碼)</p>
-      <p className={styles.userDictGridHeader}>對應字詞</p>
-      {renderRows(userDict, [{ field: 'code', maxLength: 5 }, { field: 'char' }])}
-    </div>
-  );
-
-  function renderRows(charMappings: CharMapping[], colDefines: ColDefine<CharMapping>[]): JSX.Element[] {
-    return charMappings.map((charMapping, rowIndex) => (
+  function renderRows(): JSX.Element[] {
+    return userDict.map((charMapping, rowIndex) => (
       <React.Fragment key={charMapping.id}>
         {renderDeleteButton(charMapping)}
         {colDefines.map((colDefine, colIndex) => {
@@ -144,6 +136,15 @@ const UserDictSettings: React.FC = () => {
     const colCount = 2;
     return rowNumber * colCount + colNumber;
   }
+
+  return (
+    <div className={styles.UserDictSettings}>
+      <p className={styles.userDictGridHeader} />
+      <p className={styles.userDictGridHeader}>拆碼 (最多5碼)</p>
+      <p className={styles.userDictGridHeader}>對應字詞</p>
+      {renderRows()}
+    </div>
+  );
 };
 
 export default UserDictSettings;

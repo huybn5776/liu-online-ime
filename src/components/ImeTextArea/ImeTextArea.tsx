@@ -1,14 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { filter, take, takeUntil } from 'rxjs/operators';
 
 import CaretFollowWrapper from '@components/CaretPositionWrapper/CaretFollowWrapper';
 import CharChooser from '@components/CharChooser/CharChooser';
 import { loadCharMappings } from '@services/char-mapping';
-import { CodeMatcher } from '@services/code-matcher';
-import { TypingCodePreview } from '@services/typing-code-preview';
+import { CodeMatcher, emptyMatchResult, MatchResult } from '@services/code-matcher';
+import { TextUpdateHelper } from '@services/text-update-helper';
 
+import { useStateBinding } from '../../hooks/use-state-binding';
 import styles from './ImeTextArea.module.scss';
 
 interface Props {
@@ -23,20 +24,38 @@ export enum InputMode {
   chinese = 'chinese',
 }
 
-const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsInputMode, inputModeChange }: Props) => {
-  const [typingCode, setTypingCode] = useState('');
-  const [charSelections, setCharSelections] = useState<string[]>([]);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [inputMode, setInputMode] = useState<InputMode>(propsInputMode || InputMode.chinese);
+const nextInputModeMap: Record<InputMode, InputMode> = {
+  [InputMode.chinese]: InputMode.english,
+  [InputMode.english]: InputMode.chinese,
+};
+
+function hasModifiersKey(event: KeyboardEvent): boolean {
+  return event.metaKey || event.altKey || event.ctrlKey;
+}
+
+const ImeTextArea: React.FC<Props> = ({
+  value: valueFromProp,
+  onValueChange,
+  inputMode: inputModeFromProp,
+  inputModeChange,
+}: Props) => {
+  const [value, setValue] = useStateBinding<string>('', valueFromProp, onValueChange);
+  const [inputMode, setInputMode] = useStateBinding<InputMode>(
+    inputModeFromProp || InputMode.chinese,
+    inputModeFromProp,
+    inputModeChange,
+  );
+
+  const [matchResult, setMatchResult] = useState<MatchResult>(emptyMatchResult);
   const [textArea, setTextArea] = useState<HTMLTextAreaElement | null>(null);
+  const [codeMatcher, setCodeMatcher] = useState<CodeMatcher | null>(null);
 
   const caretFollowWrapper = useRef<React.ElementRef<typeof CaretFollowWrapper>>(null);
 
-  const codeMatcher$$ = useRef(new BehaviorSubject<CodeMatcher | null>(null));
-  const codeMatcher$ = useRef<Observable<CodeMatcher>>(
-    codeMatcher$$.current.pipe(filter((matcher) => matcher !== null)) as Observable<CodeMatcher>,
-  );
+  const keyDown$$ = useMemo(() => new Subject<KeyboardEvent>(), []);
+  const keyUp$$ = useMemo(() => new Subject<KeyboardEvent>(), []);
+  const onKeyDown = useCallback((event: React.KeyboardEvent) => keyDown$$.next(event.nativeEvent), [keyDown$$]);
+  const onKeyUp = useCallback((event: React.KeyboardEvent) => keyUp$$.next(event.nativeEvent), [keyUp$$]);
 
   useEffect(() => {
     if (textArea) {
@@ -45,39 +64,31 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
   }, [textArea, value]);
 
   useEffect(() => {
-    const subscription = loadCharMappings().subscribe((charMappingDict) => {
-      codeMatcher$$.current.next(new CodeMatcher(charMappingDict));
-    });
+    const subscription = loadCharMappings().subscribe((charMappingDict) =>
+      setCodeMatcher(new CodeMatcher(charMappingDict)),
+    );
     return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!textArea) {
+    if (!textArea || !codeMatcher) {
       return () => {};
     }
     textArea.focus();
 
     const textAreaUpdated$$ = new Subject<void>();
 
-    codeMatcher$.current.subscribe((codeMatcher) => {
-      const typingCodePreview = new TypingCodePreview(textArea, codeMatcher);
+    const textUpdateHelper = new TextUpdateHelper(textArea, codeMatcher);
+    codeMatcher.matchResult$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setMatchResult);
+    codeMatcher.startTypingCode$.subscribe(() => {
+      textUpdateHelper.deleteSelectedText();
+      caretFollowWrapper.current?.updatePosition();
+      textUpdateHelper.startTyping();
+      textUpdateHelper.value$.pipe(takeUntil(codeMatcher.stopTypingCode$)).subscribe(setValue);
 
-      codeMatcher.typingCode$.pipe(takeUntil(textAreaUpdated$$)).subscribe((code) => setTypingCode(code));
-      codeMatcher.charSelections$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setCharSelections);
-      codeMatcher.page$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setPage);
-      codeMatcher.totalPage$.pipe(takeUntil(textAreaUpdated$$)).subscribe(setTotalPages);
-      codeMatcher.startTypingCode$.subscribe(() => {
-        typingCodePreview.deleteSelectedText();
-        caretFollowWrapper.current?.updatePosition();
-        typingCodePreview.startTyping();
-        typingCodePreview.value$.pipe(takeUntil(codeMatcher.stopTypingCode$)).subscribe(onValueChange);
-
-        textAreaUpdated$$.subscribe(() => {
-          codeMatcher.clear();
-          setTypingCode('');
-          setCharSelections([]);
-          typingCodePreview.dispose();
-        });
+      textAreaUpdated$$.subscribe(() => {
+        codeMatcher.clear();
+        textUpdateHelper.dispose();
       });
     });
 
@@ -85,85 +96,100 @@ const ImeTextArea: React.FC<Props> = ({ value, onValueChange, inputMode: propsIn
       textAreaUpdated$$.next();
       textAreaUpdated$$.complete();
     };
-  }, [textArea, onValueChange]);
+  }, [textArea, codeMatcher, onValueChange, setValue, setMatchResult]);
 
-  useEffect(() => setInputMode(propsInputMode || InputMode.chinese), [propsInputMode]);
+  const handleCharMappingNotReady = useCallback(
+    (event: KeyboardEvent) => {
+      const codeChars = "abcdefghijklmnopqrstuvwxyz,.'[]";
+      if (codeMatcher || !codeChars.includes(event.key)) {
+        return false;
+      }
+      setMatchResult({ ...emptyMatchResult, charSelections: ['字碼表載入中...'] });
+      caretFollowWrapper.current?.updatePosition();
+      return true;
+    },
+    [codeMatcher],
+  );
+
+  const handleCodeMatch = useCallback(
+    (event: KeyboardEvent) => {
+      if (inputMode !== InputMode.chinese || hasModifiersKey(event)) {
+        return false;
+      }
+      codeMatcher?.onKeyDown?.(event);
+      return event.defaultPrevented;
+    },
+    [inputMode, codeMatcher],
+  );
+
+  const handleShiftKey = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key !== 'Shift' || event.altKey || event.ctrlKey || event.metaKey) {
+        return false;
+      }
+
+      keyUp$$
+        .pipe(
+          take(1),
+          takeUntil(keyDown$$),
+          filter((keyEvent) => keyEvent.key === 'Shift'),
+        )
+        .subscribe(() => {
+          setInputMode((currentInputMode) => nextInputModeMap[currentInputMode]);
+          codeMatcher?.clear();
+        });
+
+      return false;
+    },
+    [keyDown$$, keyUp$$, setInputMode, codeMatcher],
+  );
+
+  const handleCopy = useCallback(
+    (event: KeyboardEvent) => {
+      if (!((event.metaKey || event.ctrlKey || event.altKey) && event.key === 'Enter')) {
+        return false;
+      }
+      codeMatcher?.clear();
+      navigator.clipboard.writeText(value);
+      event.preventDefault();
+      if (event.shiftKey) {
+        setValue('');
+      }
+      return true;
+    },
+    [codeMatcher, setValue, value],
+  );
+
+  useEffect(() => {
+    const subscription = keyDown$$.subscribe((event) => {
+      const eventHandled =
+        handleCharMappingNotReady(event) || handleCodeMatch(event) || handleShiftKey(event) || handleCopy(event);
+      if (eventHandled) {
+        event.preventDefault();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [keyDown$$, handleCharMappingNotReady, handleCodeMatch, handleCopy, handleShiftKey]);
 
   return (
     <div className={styles.ImeTextArea}>
-      <textarea className={styles.textarea} ref={setTextArea} onKeyDown={onKeyDown} />
+      <textarea
+        className={styles.textarea}
+        ref={setTextArea}
+        onChange={(event) => onValueChange?.((event.target as HTMLTextAreaElement).value)}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+      />
       <CaretFollowWrapper passive ref={caretFollowWrapper} textArea={textArea}>
-        <p className={styles.typingCode}>{typingCode}</p>
-        <CharChooser charSelections={charSelections} page={page} totalPages={totalPages} />
+        <p className={styles.typingCode}>{matchResult.typingCode}</p>
+        <CharChooser
+          charSelections={matchResult.charSelections}
+          page={matchResult.page}
+          totalPages={matchResult.totalPages}
+        />
       </CaretFollowWrapper>
     </div>
   );
-
-  function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    if (event.key === 'Shift') {
-      handleShiftKey();
-    }
-    if (inputMode === InputMode.english) {
-      onValueChange?.((event.target as HTMLTextAreaElement).value);
-      return;
-    }
-    if (!codeMatcher$$.current?.value) {
-      handleCharMappingNotReady(event);
-      return;
-    }
-
-    codeMatcher$$.current?.value?.onKeyDown?.(event);
-    if (event.isDefaultPrevented()) {
-      return;
-    }
-
-    handleCopy(event);
-  }
-
-  function handleShiftKey(): void {
-    if (!textArea) {
-      return;
-    }
-    fromEvent<KeyboardEvent>(textArea, 'keyup')
-      .pipe(
-        take(1),
-        takeUntil(fromEvent(textArea, 'keydown')),
-        filter((event) => event.key === 'Shift'),
-      )
-      .subscribe(() => {
-        const nextInputModeMap: Record<InputMode, InputMode> = {
-          [InputMode.chinese]: InputMode.english,
-          [InputMode.english]: InputMode.chinese,
-        };
-        const nextInputMode = nextInputModeMap[inputMode];
-        setInputMode(nextInputMode);
-        inputModeChange?.(nextInputMode);
-        codeMatcher$$.current?.value?.clear();
-      });
-  }
-
-  function handleCharMappingNotReady(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    const codeChars = "abcdefghijklmnopqrstuvwxyz,.'[]";
-    if (!codeChars.includes(event.key)) {
-      return;
-    }
-    setCharSelections(['字碼表載入中...']);
-    caretFollowWrapper.current?.updatePosition();
-  }
-
-  function handleCopy(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-    if (!((event.metaKey || event.ctrlKey || event.altKey) && event.key === 'Enter' && textArea)) {
-      return;
-    }
-
-    textArea.select();
-    document.execCommand('copy');
-    event.preventDefault();
-
-    if (event.shiftKey) {
-      textArea.value = '';
-    }
-  }
 };
 
 export default ImeTextArea;

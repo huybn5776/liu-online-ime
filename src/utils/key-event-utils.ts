@@ -1,6 +1,4 @@
-import React from 'react';
-
-export function isComposing(event: React.KeyboardEvent<HTMLTextAreaElement>): boolean {
+export function isComposing(event: KeyboardEvent): boolean {
   // noinspection JSDeprecatedSymbols
-  return event.nativeEvent.isComposing || event.keyCode === 229;
+  return event.isComposing || event.keyCode === 229;
 }

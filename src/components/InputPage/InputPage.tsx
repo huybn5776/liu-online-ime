@@ -31,7 +31,11 @@ const InputPage: React.FC = () => {
   useEffect(() => {
     if (quickCopyMode) {
       const subscription = fromEvent<KeyboardEvent>(document, 'keydown')
-        .pipe(filter((event) => event.key === 'Enter' && !event.shiftKey))
+        .pipe(
+          filter(
+            (event) => event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey,
+          ),
+        )
         .subscribe((event) => {
           setValue((currentValue) => {
             navigator.clipboard.writeText(currentValue);
@@ -47,7 +51,7 @@ const InputPage: React.FC = () => {
 
   return (
     <div className={styles.InputPage}>
-      <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode}/>
+      <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode} />
 
       <div className={styles.bottomToolbar}>
         <ToolbarSwitchInputMode
@@ -55,12 +59,12 @@ const InputPage: React.FC = () => {
           modeLabel={inputModeLabel[inputMode]}
           onClick={toggleInputMode}
         />
-        <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll}/>
-        <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear}/>
-        <ToolbarClear expand={toolbarExpanded} onClick={clear}/>
-        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow}/>
-        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick}/>
-        <ToolbarGoToSetting expand={toolbarExpanded}/>
+        <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll} />
+        <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear} />
+        <ToolbarClear expand={toolbarExpanded} onClick={clear} />
+        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow} />
+        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick} />
+        <ToolbarGoToSetting expand={toolbarExpanded} />
       </div>
     </div>
   );
