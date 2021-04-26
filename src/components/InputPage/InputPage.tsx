@@ -49,26 +49,6 @@ const InputPage: React.FC = () => {
     return () => {};
   }, [quickCopyMode]);
 
-  return (
-    <div className={styles.InputPage}>
-      <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode} />
-
-      <div className={styles.bottomToolbar}>
-        <ToolbarSwitchInputMode
-          expand={toolbarExpanded}
-          modeLabel={inputModeLabel[inputMode]}
-          onClick={toggleInputMode}
-        />
-        <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll} />
-        <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear} />
-        <ToolbarClear expand={toolbarExpanded} onClick={clear} />
-        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow} />
-        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick} />
-        <ToolbarGoToSetting expand={toolbarExpanded} />
-      </div>
-    </div>
-  );
-
   function toggleInputMode(): void {
     const nextInputModeMap: Record<InputMode, InputMode> = {
       [InputMode.chinese]: InputMode.english,
@@ -104,6 +84,26 @@ const InputPage: React.FC = () => {
     setToolbarExpanded(expand);
     setSetting(SettingKey.toolbarExpanded, expand);
   }
+
+  return (
+    <div className={styles.InputPage}>
+      <ImeTextArea value={value} inputMode={inputMode} onValueChange={setValue} inputModeChange={setInputMode} />
+
+      <div className={styles.bottomToolbar}>
+        <ToolbarSwitchInputMode
+          expand={toolbarExpanded}
+          modeLabel={inputModeLabel[inputMode]}
+          onClick={toggleInputMode}
+        />
+        <ToolbarCopyAll expand={toolbarExpanded} onClick={copyAll} />
+        <ToolbarCopyAndClear expand={toolbarExpanded} onClick={copyAndClear} />
+        <ToolbarClear expand={toolbarExpanded} onClick={clear} />
+        <ToolbarOpenWindow expand={toolbarExpanded} onClick={openNewWindow} />
+        <ToolbarExpandToggle expand={toolbarExpanded} onExpandChange={onExpandToggleClick} />
+        <ToolbarGoToSetting expand={toolbarExpanded} />
+      </div>
+    </div>
+  );
 };
 
 export default InputPage;

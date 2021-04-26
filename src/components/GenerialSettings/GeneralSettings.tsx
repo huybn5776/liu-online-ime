@@ -18,6 +18,29 @@ const GeneralSettings: React.FC = () => {
     setSetting(SettingKey.quickCopyMode, quickCopyMode);
   }, [quickCopyMode]);
 
+  function settingsToUrl(): string {
+    const currentUrl = new URL(window.location.href);
+    const url = new URL(currentUrl.origin);
+
+    const searchParams = {
+      cin: currentUrl.searchParams.get('cin'),
+      userDict: getUserDictAsBase64String(),
+      settings: getAllSettingsAsBase64String(),
+    };
+    Object.entries(searchParams)
+      .filter(([, value]) => isNotNilOrEmpty(value))
+      .forEach(([name, value]) => {
+        url.searchParams.append(name, value || '');
+      });
+
+    return url.href;
+  }
+
+  function copySettingUrl(): void {
+    settingUrlInput?.current?.select?.();
+    document.execCommand('copy');
+  }
+
   return (
     <div className={styles.GeneralSetting}>
       <div className={clsx('ui', 'checkbox', { checked: quickCopyMode })}>
@@ -68,29 +91,6 @@ const GeneralSettings: React.FC = () => {
       ) : null}
     </div>
   );
-
-  function settingsToUrl(): string {
-    const currentUrl = new URL(window.location.href);
-    const url = new URL(currentUrl.origin);
-
-    const searchParams = {
-      cin: currentUrl.searchParams.get('cin'),
-      userDict: getUserDictAsBase64String(),
-      settings: getAllSettingsAsBase64String(),
-    };
-    Object.entries(searchParams)
-      .filter(([, value]) => isNotNilOrEmpty(value))
-      .forEach(([name, value]) => {
-        url.searchParams.append(name, value || '');
-      });
-
-    return url.href;
-  }
-
-  function copySettingUrl(): void {
-    settingUrlInput?.current?.select?.();
-    document.execCommand('copy');
-  }
 };
 
 export default GeneralSettings;

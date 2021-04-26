@@ -100,12 +100,6 @@ const CaretPosition: React.ForwardRefRenderFunction<ForwardedProps, Props> = (
     setMirrorStyle(style);
   }, [textArea]);
 
-  return (
-    <div className={styles.CaretPosition} ref={mirrorDiv} style={mirrorStyle}>
-      <span ref={trackerSpan}>.</span>
-    </div>
-  );
-
   function getCaretPosition(textAreaElement: HTMLTextAreaElement | null): Point {
     const { mirrorElement, trackerElement } = {
       mirrorElement: mirrorDiv.current,
@@ -124,6 +118,12 @@ const CaretPosition: React.ForwardRefRenderFunction<ForwardedProps, Props> = (
       y: trackerElement.offsetTop + trackerElement.offsetHeight,
     };
   }
+
+  return (
+    <div className={styles.CaretPosition} ref={mirrorDiv} style={mirrorStyle}>
+      <span ref={trackerSpan}>.</span>
+    </div>
+  );
 };
 
 export default forwardRef(CaretPosition);

@@ -18,6 +18,19 @@ enum SettingTab {
 const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState(SettingTab.general);
 
+  function renderTabButton(id: SettingTab, text: string): JSX.Element {
+    return (
+      <button
+        type="button"
+        className={clsx('item', styles.settingTabButton, { active: activeTab === id })}
+        key={id}
+        onClick={() => setActiveTab(id)}
+      >
+        {text}
+      </button>
+    );
+  }
+
   return (
     <div className={styles.SettingsPage}>
       <div className="ui top attached tabular menu">
@@ -36,19 +49,6 @@ const SettingsPage: React.FC = () => {
       </SettingTabContent>
     </div>
   );
-
-  function renderTabButton(id: SettingTab, text: string): JSX.Element {
-    return (
-      <button
-        type="button"
-        className={clsx('item', styles.settingTabButton, { active: activeTab === id })}
-        key={id}
-        onClick={() => setActiveTab(id)}
-      >
-        {text}
-      </button>
-    );
-  }
 };
 
 export default SettingsPage;
