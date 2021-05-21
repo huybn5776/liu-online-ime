@@ -27,7 +27,7 @@
     "webpack-start": "BROWSER=none DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
     "webpack-build": "react-app-rewired build",
     "vite-start": "vite",
-    "vite-build": "eslint . && tsc && vite build"
+    "vite-build": "eslint src && tsc && vite build"
   },
   "eslintConfig": {
     "extends": [
